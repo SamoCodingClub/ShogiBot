@@ -4,7 +4,6 @@ Might not matter though because this isn't the true board that we are going to u
 
 class Piece:
 	def __init__(self, color, x, y): #-1 is black, 1 is white
-
 		self.color = color
 		self.x = x
 		self.y = y
@@ -38,10 +37,10 @@ class King(Piece):
 class Knight(Piece):
 	def genMoves(self):
 		moves = []
-		if board.array[self.x + 1][self.y + (2*self.color)] == "." :
-			moves.append([self.x + 1],[self.y +(2*self.color)])
-		if board.array[self.x - 1][self.y + (2*self.color)] == ".":
-			moves.append([self.x - 1],[self.y +(2 *self.color)])
+		if board.array[self.x + 1][self.y + (2 * self.color)] == "." :
+			moves.append([self.x + 1],[self.y +(2 * self.color)])
+		if board.array[self.x - 1][self.y + (2 * self.color)] == ".":
+			moves.append([self.x - 1],[self.y + (2 * self.color)])
 		return moves
 
 class Bishop(Piece):
@@ -52,12 +51,12 @@ class Bishop(Piece):
 			for s in l:
 				if t == -1 and l == -1:
 					break
-				c =board.array[self.x + t][self.y + l]
+				temp = board.array[self.x + t][self.y + l]
 				count = 1
-				while c == ".":
+				while temp == ".":
 					moves.append([self.x + (count * t), self.y + (count * l)])
 					count += 1
-					c = board.array[self.x + (count * t)][self.y + (count * l)]
+					temp = board.array[self.x + (count * t)][self.y + (count * l)]
 		return moves
 
 class Silver_General(Piece): #can abreviate if you want
@@ -72,16 +71,15 @@ class Silver_General(Piece): #can abreviate if you want
 		return moves
 
 class Lance(Piece):
-
 	def genMoves(self):
 		moves = []
-		c = board.array[self.x][self.y+self.color]
+		temp = board.array[self.x][self.y+self.color]
 		print([self.x,self.y])
 		count = 1
-		while c == ".":
+		while temp == ".":
 			moves.append([self.x,self.y + (count*self.color)])
 			count += 1
-			c = board.array[self.x][self.y + (count*self.color)]
+			temp = board.array[self.x][self.y + (count*self.color)]
 			print(count)
 		return moves
 			
@@ -89,25 +87,25 @@ class Lance(Piece):
 class Rook(Piece):
 	def genMoves(self):
 		moves = []
-		c = [self.x, self.y]
+		temp = [self.x, self.y]
 		l = [-1, 1]
 		for x in l:
 			count = 1
 			if self.checkBounds(self.x, self.y + (count*x)):
-				c = board.array[self.x][self.y+(count*x)]
+				temp = board.array[self.x][self.y+(count*x)]
 			while self.checkBounds(self.x, self.y + (x*count)):
-					c = board.array[self.x][self.y + (count*x)]
-					if c == ".":
+					temp = board.array[self.x][self.y + (count*x)]
+					if temp == ".":
 						moves.append([self.x,self.y + (x*count)])
 						count += 1
 					else:
 						break
 			count = 1
 			if self.checkBounds(self.x+(count*x), self.y):
-				c = board.array[self.x+(count*x)][self.y]
+				temp = board.array[self.x+(count*x)][self.y]
 			while self.checkBounds(self.x+(count*x),self.y):
-				c = board.array[self.x+(count*x)][self.y]
-				if c == ".":
+				temp = board.array[self.x+(count*x)][self.y]
+				if temp == ".":
 					moves.append([self.x + (x*count),self.y])
 					count += 1
 				else:
@@ -128,50 +126,38 @@ class Gold_General(Piece): #can abreviate if you want
 #I'm not doing promoted pieces
 
 class Board:
-	def __init__(self, array, string, p1_hand, p2_hand, set_str):
+	def __init__(self, array, string, p1_hand, p2_hand):
 		self.array = array
+		self.string = string
 		self.p1_hand = p1_hand
 		self.p2_hand = p2_hand
 	
-	def setup(self):
+	def set(self, string):
 		self.array = [["." for y in range(9)] for x in range(9)]
-		#innermost ranks in setup
-		for x in range(9):
-			self.array[x][6] = Pawn( -1, x, 6)
-			self.array[x][2] = Pawn( 1, x, 2)
-		#I'm not making this efficient
-		#middle ranks in setup
-		"""self.array[1][1] = Bishop("b", 0)
-		self.array[1][7] = Bishop("B", 1)
-		
-		self.array[7][1] = Rook("r", 0)
-		self.array[7][7] = Rook("R", 1)
-		#outermost ranks in setup
-		self.array[0][0] = Lance("l", 0)
-		self.array[1][0] = Knight("n", 0)
-		self.array[2][0] = Silver_General("s", 0)
-		self.array[3][0] = Gold_General("g", 0)
-		self.array[4][0] = King("k", 0)
-		self.array[5][0] = Gold_General("g", 0)
-		self.array[6][0] = Silver_General("s", 0)
-		self.array[7][0] = Knight("n", 0)
-		self.array[8][0] = Lance("l", 0)
-		
-		self.array[0][8] = Lance("L", 1)
-		self.array[1][8] = Knight("K", 1)
-		self.array[2][8] = Silver_General("S", 1)
-		self.array[3][8] = Gold_General("G", 1)
-		self.array[4][8] = King("K", 1)
-		self.array[5][8] = Gold_General("G", 1)
-		self.array[6][8] = Silver_General("S", 1)
-		self.array[7][8] = Knight("N", 1)
-		self.array[8][8] = Lance("L", 1)"""
-	#char_to_class = {
-	def set(self):
-		input_arr = self.set_str.split("/")
+		input_arr = string.split("/")
 		for entry in input_arr:
 			try:
-				self.array[int(entry[0])][int(entry[1])] = entry[2]
+				if entry.lower() == entry: #this is terrible code change it eventually probably
+					color = -1
+				else:
+					color = 1
+				entry = entry.lower()
+				if "p" in entry: #change to switch if you want to switch later maybe possibly
+					self.array[int(entry[0])][int(entry[1])] = Pawn(color, int(entry[0]), int(entry[1]))
+				elif "k" in entry:
+					self.array[int(entry[0])][int(entry[1])] = King(color, int(entry[0]), int(entry[1]))
+				elif "s" in entry:
+					self.array[int(entry[0])][int(entry[1])] = Silver_General(color, int(entry[0]), int(entry[1]))
+				elif "r" in entry:
+					self.array[int(entry[0])][int(entry[1])] = Rook(color, int(entry[0]), int(entry[1]))
+				elif "b" in entry:
+					self.array[int(entry[0])][int(entry[1])] = Bishop(color, int(entry[0]), int(entry[1]))
+				elif "g" in entry:
+					self.array[int(entry[0])][int(entry[1])] = Gold_General(color, int(entry[0]), int(entry[1]))
+				elif "n" in entry:
+					self.array[int(entry[0])][int(entry[1])] = Knight(color, int(entry[0]), int(entry[1]))
+				elif "l" in entry:
+					self.array[int(entry[0])][int(entry[1])] = Lance(color, int(entry[0]), int(entry[1]))
 			except:
 				print("There was an error with setting the board. The issue was with:", entry)
 	
@@ -190,9 +176,7 @@ class Board:
 		self.string += "\n"
 		print(self.string)
 
-board = Board([], "", [], [], "")
+board = Board([], "", [], [])
 
-board.setup()
+board.set("00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/17b/77r/06p/16p/26p/36p/46p/56p/66p/76p/86p")
 board.print()
-l = Rook(-1, 2,3)
-print(l.genMoves())
