@@ -3,20 +3,20 @@
 Might not matter though because this isn't the true board that we are going to use, henry can deal with it"""
 
 class Piece:
-	def __init__(self, name, color, x, y): #-1 is black, 1 is white
-		self.name = name
+	def __init__(self, color, x, y): #-1 is black, 1 is white
+
 		self.color = color
 		self.x = x
 		self.y = y
 	
-	def checkBounds(x, y):
-		if x < 0 or x > 9 or x < 0 or y > 9:
+	def checkBounds(self, x, y):
+		if x < 0 or x > 8 or y < 0 or y > 8:
 			return False
 		else:
 			return True
  
 class Pawn(Piece):
-	def genMoves():
+	def genMoves(self):
 		moves = []
 		new_y = self.y + self.color
 		if self.checkBounds(self.x, new_y) and board.array[self.x][new_y] == ".":
@@ -25,62 +25,105 @@ class Pawn(Piece):
 	
 
 class King(Piece):
-	def genMoves():
+	def genMoves(self):
 		moves = []
 		for delta_x in range(-1, 2):
 			for delta_y in range(-1, 2):
 				new_x = self.x + self.color * delta_x
 				new_y = self.y + self.color * delta_y
-				if (x != 0 and y != 0) and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] == ".":
+				if (delta_x != 0 and delta_y != 0) and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] == ".":
 					moves.append([new_x, new_y])
 		return moves
 
 class Knight(Piece):
-	def genMoves():
+	def genMoves(self):
 		moves = []
-		if board.array[self.x + 1][self.y +2] == ".":
-			moves.append([self.x + 1],[self.y +2])
-		if board.array[self.x - 1][self.y +2] == ".":
-			moves.append([self.x - 1],[self.y +2])
+		if board.array[self.x + 1][self.y + (2*self.color)] == "." :
+			moves.append([self.x + 1],[self.y +(2*self.color)])
+		if board.array[self.x - 1][self.y + (2*self.color)] == ".":
+			moves.append([self.x - 1],[self.y +(2 *self.color)])
 		return moves
 
 class Bishop(Piece):
-	def genMoves():
+	def genMoves(self):
 		moves = []
+		l = [-1,1]
 		for t in l:
-			a = t
 			for s in l:
-				b = s
-				if a == -1 and b == -1:
+				if t == -1 and l == -1:
 					break
-				c =board.array[self.x + a][self.y + b]
+				c =board.array[self.x + t][self.y + l]
 				count = 1
 				while c == ".":
-					moves.append([self.x + (count * a), self.y + (count * b)])
+					moves.append([self.x + (count * t), self.y + (count * l)])
 					count += 1
-					c = board.array[self.x + (count * a)][self.y + (count * b)]
+					c = board.array[self.x + (count * t)][self.y + (count * l)]
 		return moves
 
 class Silver_General(Piece): #can abreviate if you want
-	pass
+	def genMoves(self):
+		moves = []
+		for delta_x in range(-1, 2):
+			for delta_y in range(-1, 2):
+				new_x = self.x + self.color * delta_x
+				new_y = self.y + self.color * delta_y
+				if (delta_x == 0 and delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] == ".":
+					moves.append([new_x, new_y])
+		return moves
 
 class Lance(Piece):
-	def genMoves():
+
+	def genMoves(self):
 		moves = []
-		c = board.array[self.x][self.y+1]
+		c = board.array[self.x][self.y+self.color]
+		print([self.x,self.y])
 		count = 1
 		while c == ".":
-			moves.append([self.x],[self.y + count])
+			moves.append([self.x,self.y + (count*self.color)])
 			count += 1
-			c = board.array[self.x][self.y + count]
+			c = board.array[self.x][self.y + (count*self.color)]
+			print(count)
 		return moves
 			
 			
 class Rook(Piece):
-	pass
+	def genMoves(self):
+		moves = []
+		c = [self.x, self.y]
+		l = [-1, 1]
+		for x in l:
+			count = 1
+			if self.checkBounds(self.x, self.y + (count*x)):
+				c = board.array[self.x][self.y+(count*x)]
+			while self.checkBounds(self.x, self.y + (x*count)):
+					c = board.array[self.x][self.y + (count*x)]
+					if c == ".":
+						moves.append([self.x,self.y + (x*count)])
+						count += 1
+					else:
+						break
+			count = 1
+			if self.checkBounds(self.x+(count*x), self.y):
+				c = board.array[self.x+(count*x)][self.y]
+			while self.checkBounds(self.x+(count*x),self.y):
+				c = board.array[self.x+(count*x)][self.y]
+				if c == ".":
+					moves.append([self.x + (x*count),self.y])
+					count += 1
+				else:
+					break
+		return moves
 
 class Gold_General(Piece): #can abreviate if you want
-	pass
+	def genMoves(self):
+		moves = []
+		for delta_x in range(-1, 2):
+			for delta_y in range(-1, 2):
+				new_x = self.x + self.color * delta_x
+				new_y = self.y + self.color * delta_y
+				if (delta_x == 0 and delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] == ".":
+					moves.append([new_x, new_y])
+		return moves
 
 #I'm not doing promoted pieces
 
@@ -90,12 +133,12 @@ class Board:
 		self.p1_hand = p1_hand
 		self.p2_hand = p2_hand
 	
-	def setup(self): """delete this when set is done"""
+	def setup(self):
 		self.array = [["." for y in range(9)] for x in range(9)]
 		#innermost ranks in setup
 		for x in range(9):
-			self.array[x][6] = Pawn("P", -1, x, 6)
-			self.array[x][2] = Pawn("p", 1, x, 2)
+			self.array[x][6] = Pawn( -1, x, 6)
+			self.array[x][2] = Pawn( 1, x, 2)
 		#I'm not making this efficient
 		#middle ranks in setup
 		"""self.array[1][1] = Bishop("b", 0)
@@ -132,7 +175,7 @@ class Board:
 			except:
 				print("There was an error with setting the board. The issue was with:", entry)
 	
-	def print(self): """ISSUE: both knights and kings are k because of how this works"""
+	def print(self):
 		self.string = ""
 		for y in range(9):
 			self.string += "\n"
@@ -151,4 +194,5 @@ board = Board([], "", [], [], "")
 
 board.setup()
 board.print()
-#this is almost as long as my minesweeper already
+l = Rook(-1, 2,3)
+print(l.genMoves())
