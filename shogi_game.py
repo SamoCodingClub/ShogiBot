@@ -1,19 +1,32 @@
 """IMPORTANT: notation idea: xy?(spacer), ex. 12p/43k/."""
 """ISSUE: both knights and kings are k when printed. 
 Might not matter though because this isn't the true board that we are going to use, henry can deal with it"""
+import tkinter as tk
+
+root = tk.Tk()
+boardSize = 20
+canvas = tk.Canvas(root, width=9*boardSize, height=9*boardSize, bg="white")
+canvas.pack()
+
+for num in range(0, 10):
+	canvas.create_line(boardSize * num, 0, boardSize * num, 9 * boardSize)
+	canvas.create_line(0, boardSize * num, 9 * boardSize, boardSize * num)
+
+
 
 class Piece:
 	def __init__(self, color, x, y): #-1 is black, 1 is white
 		self.color = color
 		self.x = x
 		self.y = y
-	
+
+
 	def checkBounds(self, x, y):
 		if x < 0 or x > 8 or y < 0 or y > 8:
 			return False
 		else:
 			return True
- 
+
 class Pawn(Piece):
 	def genMoves(self):
 		moves = []
@@ -21,7 +34,7 @@ class Pawn(Piece):
 		if self.checkBounds(self.x, new_y) and board.array[self.x][new_y] == ".":
 			moves.append([self.x, new_y])
 		return moves
-	
+
 
 class King(Piece):
 	def genMoves(self):
@@ -82,8 +95,8 @@ class Lance(Piece):
 			temp = board.array[self.x][self.y + (count*self.color)]
 			print(count)
 		return moves
-			
-			
+
+
 class Rook(Piece):
 	def genMoves(self):
 		moves = []
@@ -131,7 +144,7 @@ class Board:
 		self.string = string
 		self.p1_hand = p1_hand
 		self.p2_hand = p2_hand
-	
+
 	def set(self, string):
 		self.array = [["." for y in range(9)] for x in range(9)]
 		input_arr = string.split("/")
@@ -160,7 +173,7 @@ class Board:
 					self.array[int(entry[0])][int(entry[1])] = Lance(color, int(entry[0]), int(entry[1]))
 			except:
 				print("There was an error with setting the board. The issue was with:", entry)
-	
+
 	def print(self):
 		self.string = ""
 		for y in range(9):
@@ -177,6 +190,28 @@ class Board:
 		print(self.string)
 
 board = Board([], "", [], [])
-
 board.set("00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/17b/77r/06p/16p/26p/36p/46p/56p/66p/76p/86p")
 board.print()
+
+def Piece(x, y, piece):
+	canvas.create_text(boardSize * (x + .5), boardSize * (8.5 - y), text=piece, font=("MS Sans Serif", 15), fill="black")
+def drawBoard():
+	for x, column in enumerate(board.array):
+		for y, piece in enumerate(column):
+			white = False
+			if piece != ".":
+				if piece.color == 1:
+					white = True  
+				name = board.array[x][y].__class__.__name__
+				if name == "Knight":
+					if white:
+						Piece(x, y, "N")
+					else:
+						Piece(x, y, "n")      
+				else:
+					if white:
+						Piece(x, y, name[0])  
+					else:
+						Piece(x, y, name[0].lower())
+drawBoard()
+root.mainloop()
