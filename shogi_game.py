@@ -1,6 +1,7 @@
-"""IMPORTANT: notation idea: xy?(spacer), ex. 12p/43k/."""
-"""ISSUE: both knights and kings are k when printed. 
-Might not matter though because this isn't the true board that we are going to use, henry can deal with it"""
+"""IMPORTANT: notation idea: xy(piece)(spacer), ex. 12p/43k/."""
+
+"""why do we have main.py in github are we even using it"""
+
 import tkinter as tk
 
 """root = tk.Tk()
@@ -12,6 +13,12 @@ for num in range(0, 10):
 	canvas.create_line(boardSize * num, 0, boardSize * num, 9 * boardSize)
 	canvas.create_line(0, boardSize * num, 9 * boardSize, boardSize * num)"""
 
+class Player:
+	def __init__(self, hand)
+		self.hand = hand
+	#get input here? can have target coordinates in the class or in a function i dunno
+
+#IMPORTANT the x and y doesn't work right now fix it later
 class Piece:
 	def __init__(self, color, x, y): #-1 is black, 1 is white
 		self.color = color
@@ -39,7 +46,6 @@ class Pawn(Piece):
 	
 	def promote(self):
 		board.array[self.x][self.y] = Gold_General(self.color, self.x, self.y,)
-	
 
 class King(Piece):
 	def genMoves(self):
@@ -69,7 +75,7 @@ class Knight(Piece):
 class Bishop(Piece): #this is bad and all the stuff like it is bad and I am sorry for that add checkBounds so that it actually does something
 	def genMoves(self):
 		moves = []
-		l = [-1,1]
+		l = [-1, 1]
 		for t in l:
 			for s in l:
 				if t == -1 and l == -1:
@@ -164,6 +170,7 @@ class Gold_General(Piece): #can abreviate if you want
 					moves.append([new_x, new_y])
 		return moves
 
+#might be broken
 """class Dragon_Horse(Piece): #this doesnt work either
 	def genMoves(self):
 		moves = []
@@ -215,11 +222,11 @@ class Dragon_King(Piece):
 		return moves"""
 
 class Board: #must incrememnt turn_num after each move please please
-	def __init__(self, array, string, p1_hand, p2_hand, turn_num):
+	def __init__(self, array, string, turn_num):
 		self.array = array
 		self.string = string
-		self.p1_hand = p1_hand
-		self.p2_hand = p2_hand
+		"""self.p1_hand = p1_hand
+		self.p2_hand = p2_hand"""
 		self.turn_num = turn_num
 
 	def set(self, string): #does not load hands
@@ -265,8 +272,8 @@ class Board: #must incrememnt turn_num after each move please please
 						self.string += str(self.array[x][y].__class__.__name__)[0].lower() + " "
 		self.string += "\n"
 		print(self.string)
-		
-	def createSet(self): #does not save hands also there is no way I did this well it looks so bad 
+
+	def createSet(self): #does not save hands
 		entry = 1
 		set_str = ""
 		for y in range(9):
@@ -282,7 +289,9 @@ class Board: #must incrememnt turn_num after each move please please
 					entry +=1
 		return set_str
 	
-	def checkLegality(self, target_x, target_y, new_x, new_y): #checks current board position, not future like it is supposed to
+	def checkLegality(self, target_x, target_y, new_x, new_y): #says returns new but where is new
+		original = self.createSet()
+		board.movePiece([target_x, target_y, new_x, new_y])
 		for y in range(9):
 			for x in range(9):
 				if turn_num % 2 == 0 and self.array[x][y].__class__.__name__ == "King" and self.array[x][y].color == -1:
@@ -292,31 +301,67 @@ class Board: #must incrememnt turn_num after each move please please
 		for y in range(9):
 			for x in range(9):
 				if self.array[x][y].__class__.__name__ != ".":
-					for entry in self.array[x][y].genMoves():
+					for entry in self[x][y].genMoves():
 						if entry == king_pos:
-							return False
-		return True
+							return original
+		return new #where is new
 	
-	def movePiece(self): #temp, remember to change both their x and y position in the array and their x and y position in the class
-		input_str = input("xyxy because I'm lazy\n") #as this is just a test I'll assume they did the correct format
-		input_arr = [[int(input_str[0]), int(input_str[1])], [int(input_str[2]), int(input_str[3])]]
+	def movePiece(iself, input_arr): #temp, remember to change both their x and y position in the array and their x and y position in the class
 		print(input_arr)
 		for entry in self.array[input_arr[0][0]][input_arr[0][1]].genMoves():
 			if entry == input_arr[1]:
-				if self.array[input_arr[1][0]][input_arr[1][1]].__class__.__name__ != "." and self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
-					self.p2_hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
-				elif self.array[input_arr[1][0]][input_arr[1][1]].__class__.__name__ != ".":
-					self.p1_hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
+				if input_arr[1][0].color == -1:
+					p1.hand.append(self.array[input_arr[2][3])
+				elif input_arr[1][1].color == 1:
+					p2.hand.append(input_arr[2][3])
 				self.array[input_arr[1][0]][input_arr[1][1]] = self.array[input_arr[0][0]][input_arr[0][1]] #moves piece
 				self.array[input_arr[1][0]][input_arr[1][1]].x = input_arr[1][0] #sets new x
 				self.array[input_arr[1][0]][input_arr[1][1]].y = input_arr[1][1] #sets new y
 				self.array[input_arr[0][0]][input_arr[0][1]] = Empty() #sets old position to empty
 				self.turn_num += 1
+				
+		else:
+			print("Illegal move, please try again.")
+			#get input again
+	
+	def placePiece(self, piece, x, y): #im confused reading this
+		hand = []
+		if self.turn_num % 2 == 1:
+			hand = p2.hand
+		elif self.turn_num %2 == 0:
+			hand = p1.hand
+		boolean_value = False:
+		for p in hand:
+			if p.__class__.__name__ == piece.__class__.__name:
+				boolean_value = True
+		if booleanvalue and self.array[x][y].__class__.__name__ == ".": #this eats your piece if you place it wrong fix later
+			self.array[x][y] = piece
+			if len(self.array[x][y].genMoves()) == 0:
+				self.array[x][y] = Empty()
+				return False
+			for z in range(9):
+				if self.array[x][z].__class__.__name__ == "Pawn":
+					
+					self.array[x][y] = Empty()
+					return False
+		return True
+		
+		
+#setup for classes
+board = Board([], "", 0)
+p1 = Player([])
+p2 = Player([])
 
-board = Board([], "", [], [], 0)
+#setup with functions
 board.set("00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/17b/77r/06p/16p/26p/36p/46p/56p/66p/76p/86p")
+
 board.print()
-board.movePiece()
+#this was moved and should be put in its own function again (start)
+input_str = input("xyxy because I'm lazy\n") #as this is just a test I'll assume they did the correct format
+input_arr = [[int(input_str[0]), int(input_str[1])], [int(input_str[2]), int(input_str[3])]]
+#(end)
+board.movePiece(input_arr)
+print(p1.hand, p2.hand)
 
 """def piece(x, y, piece):
 	canvas.create_text(boardSize * (x + .5), boardSize * (8.5 - y), text=piece, font=("MS Sans Serif", 15), fill="black")
@@ -326,7 +371,7 @@ def drawBoard():
 		for y, piece in enumerate(column):
 			white = False
 			if piece != ".":
-				if piece.color == 1:
+				ifs piece.color == 1:
 					white = True  
 				name = board.array[x][y].__class__.__name__
 				if name == "Knight":
