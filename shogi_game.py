@@ -14,7 +14,7 @@ for num in range(0, 10):
 	canvas.create_line(0, boardSize * num, 9 * boardSize, boardSize * num)"""
 
 class Player:
-	def __init__(self, hand)
+	def __init__(self, hand):
 		self.hand = hand
 	#get input here? can have target coordinates in the class or in a function i dunno
 
@@ -278,7 +278,7 @@ class Board: #must incrememnt turn_num after each move please please
 		set_str = ""
 		for y in range(9):
 			for x in range(9):
-				if self.array[x][y] != ".":
+				if self.array[x][y].__class.__name__ != ".":
 					if entry > 1:
 						set_str += "/"
 					set_str += str(self.array[x][y].x) + str(self.array[x][y].y)
@@ -306,13 +306,16 @@ class Board: #must incrememnt turn_num after each move please please
 							return original
 		return new #where is new
 	
-	def movePiece(iself, input_arr): #temp, remember to change both their x and y position in the array and their x and y position in the class
-		print(input_arr)
+	def movePiece(self, input_arr): #temp, remember to change both their x and y position in the array and their x and y position in the class
+		print(self.array[input_arr[0][0]][input_arr[0][1]].genMoves())
+		print([input_arr[1][0], input_arr[1][1]])
 		for entry in self.array[input_arr[0][0]][input_arr[0][1]].genMoves():
-			if entry == input_arr[1]:
-				if input_arr[1][0].color == -1:
-					p1.hand.append(self.array[input_arr[2][3])
-				elif input_arr[1][1].color == 1:
+			print(entry)
+			if entry == [input_arr[1][0], input_arr[1][1]]:
+				print("works")
+				if self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
+					p1.hand.append(self.array[input_arr[2][3]])
+				elif self.array[input_arr[1][0]][input_arr[1][1]].color == 1:
 					p2.hand.append(input_arr[2][3])
 				self.array[input_arr[1][0]][input_arr[1][1]] = self.array[input_arr[0][0]][input_arr[0][1]] #moves piece
 				self.array[input_arr[1][0]][input_arr[1][1]].x = input_arr[1][0] #sets new x
@@ -320,9 +323,9 @@ class Board: #must incrememnt turn_num after each move please please
 				self.array[input_arr[0][0]][input_arr[0][1]] = Empty() #sets old position to empty
 				self.turn_num += 1
 				
-		else:
-			print("Illegal move, please try again.")
-			#get input again
+			else:
+				print("Illegal move, please try again.")
+				#get input again
 	
 	def placePiece(self, piece, x, y): #im confused reading this
 		hand = []
@@ -330,7 +333,7 @@ class Board: #must incrememnt turn_num after each move please please
 			hand = p2.hand
 		elif self.turn_num %2 == 0:
 			hand = p1.hand
-		boolean_value = False:
+		boolean_value = False
 		for p in hand:
 			if p.__class__.__name__ == piece.__class__.__name:
 				boolean_value = True
@@ -356,13 +359,15 @@ p2 = Player([])
 board.set("00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/17b/77r/06p/16p/26p/36p/46p/56p/66p/76p/86p")
 
 board.print()
+p = Pawn(1,1,2)
+print(p.genMoves())
 #this was moved and should be put in its own function again (start)
 input_str = input("xyxy because I'm lazy\n") #as this is just a test I'll assume they did the correct format
 input_arr = [[int(input_str[0]), int(input_str[1])], [int(input_str[2]), int(input_str[3])]]
 #(end)
 board.movePiece(input_arr)
 print(p1.hand, p2.hand)
-
+board.print()
 """def piece(x, y, piece):
 	canvas.create_text(boardSize * (x + .5), boardSize * (8.5 - y), text=piece, font=("MS Sans Serif", 15), fill="black")
 
