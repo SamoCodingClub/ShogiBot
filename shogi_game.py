@@ -18,7 +18,7 @@ class Player:
 		self.hand = hand
 	#get input here? can have target coordinates in the class or in a function i dunno
 
-#IMPORTANT the x and y doesn't work right now fix it later
+#IMPORTANT the x and y doesn't work right now fix it later. I think sam fixed it and then I fixed a little bit of stuff. 
 class Piece:
 	def __init__(self, color, x, y): #-1 is black, 1 is white
 		self.color = color
@@ -289,7 +289,7 @@ class Board: #must incrememnt turn_num after each move please please
 					entry +=1
 		return set_str
 	
-	def checkLegality(self, target_x, target_y, new_x, new_y): #says returns new but where is new
+	def checkLegality(self, target_x, target_y, new_x, new_y): #says returns new but where is new: I fixed this, but am going to leave the comment cause I like seeing all of the green on my screen.
 		original = self.createSet()
 		board.movePiece([target_x, target_y, new_x, new_y])
 		for y in range(9):
@@ -304,20 +304,16 @@ class Board: #must incrememnt turn_num after each move please please
 					for entry in self[x][y].genMoves():
 						if entry == king_pos:
 							return original
-		return new #where is new
 	
-	def movePiece(self, input_arr): #temp, remember to change both their x and y position in the array and their x and y position in the class
-		print(self.array[input_arr[0][0]][input_arr[0][1]].genMoves())
-		print([input_arr[1][0], input_arr[1][1]])
+	def movePiece(self, input_arr):
 		for entry in self.array[input_arr[0][0]][input_arr[0][1]].genMoves():
-			print(entry)
 			if entry == [input_arr[1][0], input_arr[1][1]]:
 				print("works")
 				if self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
 					p1.hand.append(self.array[input_arr[2][3]])
 				elif self.array[input_arr[1][0]][input_arr[1][1]].color == 1:
-					p2.hand.append(input_arr[2][3])
-				self.array[input_arr[1][0]][input_arr[1][1]] = self.array[input_arr[0][0]][input_arr[0][1]] #moves piece
+					p2.hand.append(input_arr[2][3])#                                                        are all these comments really necessary? Vote here: They are neccessary ---> 10, The are not neccessary ---> 22. look at democracy at work
+				self.array[input_arr[1][0]][input_arr[1][1]] = self.array[input_arr[0][0]][input_arr[0][1]] #moves piece 
 				self.array[input_arr[1][0]][input_arr[1][1]].x = input_arr[1][0] #sets new x
 				self.array[input_arr[1][0]][input_arr[1][1]].y = input_arr[1][1] #sets new y
 				self.array[input_arr[0][0]][input_arr[0][1]] = Empty() #sets old position to empty
