@@ -98,10 +98,10 @@ class Knight(Piece):
         moves = []
         if board.array[self.x + 1][self.y +
                                    (2 * self.color)].color != self.color:
-            moves.append([self.x + 1], [self.y + (2 * self.color)])
+            moves.append([self.x + 1, self.y + (2 * self.color)])
         if board.array[self.x - 1][self.y +
                                    (2 * self.color)].color != self.color:
-            moves.append([self.x - 1], [self.y + (2 * self.color)])
+            moves.append([self.x - 1, self.y + (2 * self.color)])
         return moves
 
     def promote(self):
@@ -123,13 +123,14 @@ class Bishop(
             for s in l:
                 if t == -1 and l == -1:
                     break
-                temp = board.array[self.x + t][self.y + l]
+                temp = board.array[self.x + t][self.y + s]
+                print(temp)
                 count = 1
-                while self.checkBounds(temp[0],
-                                       temp[1]) and temp.color != self.color:
-                    moves.append([self.x + (count * t), self.y + (count * l)])
+                while self.checkBounds(self.x+t,
+                                       self.y+s) and temp.color != self.color:
+                    moves.append([self.x + (count * t), self.y + (count * s)])
                     count += 1
-                    temp = [self.x + (count * t), self.y + (count * l)]
+                    temp = [self.x + (count * t), self.y + (count * s)]
         return moves
 
     def promote(self):
@@ -164,7 +165,7 @@ class Lance(Piece):
         temp = board.array[self.x][self.y + self.color]
         print([self.x, self.y])
         count = 1
-        while self.checkBounds(temp) and temp.color != self.color:
+        while self.checkBounds(self.x, self.y) and temp.color != self.color:
             moves.append([self.x, self.y + (count * self.color)])
             count += 1
             temp = board.array[self.x][self.y + (count * self.color)]
@@ -396,10 +397,8 @@ class Board:  # must incrememnt turn_num after each move please please
     def movePiece(
         self, input_arr
     ):  # temp, remember to change both their x and y position in the array and their x and y position in the class
-        print(self.array[input_arr[0][0]][input_arr[0][1]].genMoves())
-        print([input_arr[1][0], input_arr[1][1]])
+        
         for entry in self.array[input_arr[0][0]][input_arr[0][1]].genMoves():
-            print(entry)
             if entry == [input_arr[1][0], input_arr[1][1]]:
                 if self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
                     p1.hand.append(self.array[input_arr[2][3]])
@@ -453,38 +452,40 @@ board.set(
 )
 
 
-def draw_piece(x, y, pieces):
-    canvas.create_text(boardSize * (x + .5),
-                       boardSize * (8.5 - y),
-                       text=pieces,
-                       font=("Ariel", 15),
-                       fill="black",
-                       tags=f"p{x}{y}")
+def draw_piece(x, y, p):
+    if p.color == 1:
+            canvas.create_text(boardSize * (x + .5),
+                   boardSize * (8.5 - y),
+                   text=p.__class__.__name__[0],
+                   font=("Ariel", 15),
+                   fill="black",
+                   tags=f"p{x}{y}")
+    else:
+        canvas.create_text(boardSize * (x + .5),
+               boardSize * (8.5 - y),
+               text=str.lower(p.__class__.__name__[0]),
+               font=("Ariel", 15),
+               fill="black",
+               tags=f"p{x}{y}")
+    
 
 
 def draw_board():
     for x, column in enumerate(board.array):
-        for y, piece in enumerate(column):
-            name = str(board.array[x][y].__class__.__name__)
-
-            if piece.color == 1:
-                draw_piece(x, y, name[0])
-            elif piece.color == -1:
-                draw_piece(x, y, name[0].lower())
+        for y, thing in enumerate(column):
+            draw_piece(x, y, board.array[x][y])
 
 
 def a_literal_move(input_str):
-    board.print()
-    input_arr = [[int(input_str[0]), int(input_str[1])],
-                 [int(input_str[2]), int(input_str[3])]]
+    x1 = int(input_str[0])
+    y1 = int(input_str[1])
+    x2 = int(input_str[2])
+    y2 = int(input_str[3])
+    input_arr = [[x1, y1], [x2, y2]]
     board.movePiece(input_arr)
-    canvas.delete(f"p{input_str[:2]}")
-    draw_piece(
-        int(input_str[0]), int(input_str[1]), board.array[int(
-            input_str[0])][int(input_str[1])].__class__.__name__[0])
-    draw_piece(
-        int(input_str[2]), int(input_str[3]), board.array[int(
-            input_str[2])][int(input_str[3])].__class__.__name__[0])
+    canvas.delete(f"p{x1}{y1}")
+    draw_piece(x1, y1, board.array[x1][y1])
+    draw_piece(x2, y2, board.array[x2][y2])
 
 
 x=-1
@@ -507,7 +508,6 @@ while run is True:
         
         t += 1
         if t % 2 == 1:
-            print(f"{x}{y}")
             if board.turn_num % 2 == 0 :
                 time = 1
             elif board.turn_num % 2 == 1:
@@ -521,6 +521,8 @@ while run is True:
             x, y = -1, -1
         else:
             a_literal_move(f"{thing}{x}{y}")
+            print(f"{x}{y}")
+            board.print()
             t = 0
 
 
