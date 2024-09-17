@@ -46,7 +46,7 @@ for c in collection:
         print(count)
         url = url.split("&")[0] + str("&") + "index=" + str(count)
 print(database)
-f = open(file, "w", newline="")
+f = open(file, "w")
 for x in database:
     for y in x:
         f.write(y)
