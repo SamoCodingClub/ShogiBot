@@ -79,12 +79,15 @@ class King(Piece):
         moves = []
         for delta_x in range(-1, 2):
             for delta_y in range(-1, 2):
-                new_x = self.x + self.color * delta_x
-                new_y = self.y + self.color * delta_y
-                if (delta_x != 0 and delta_y != 0) and self.checkBounds(
+                new_x = self.x + (self.color * delta_x)
+                new_y = self.y + (self.color * delta_y)
+                print(new_x,new_y)
+                if (delta_x != 0 or delta_y != 0) and self.checkBounds(
                         new_x, new_y
                 ) and board.array[new_x][new_y].color != self.color:
                     moves.append([new_x, new_y])
+        
+        print(moves)
         return moves
 
 
@@ -124,13 +127,12 @@ class Bishop(
                 if t == -1 and l == -1:
                     break
                 temp = board.array[self.x + t][self.y + s]
-                print(temp)
+                print(board.array)
                 count = 1
-                while self.checkBounds(self.x+t,
-                                       self.y+s) and temp.color != self.color:
+                while self.checkBounds(self.x + (count * t),self.y + (count * s)) and temp.color != self.color:
                     moves.append([self.x + (count * t), self.y + (count * s)])
+                    temp = board.array[self.x + (count * t)][self.y + (count * s)]
                     count += 1
-                    temp = [self.x + (count * t), self.y + (count * s)]
         return moves
 
     def promote(self):
@@ -138,15 +140,13 @@ class Bishop(
 
 
 class Silver_General(Piece):  # can abreviate if you want
-
     def genMoves(self):
         moves = []
         for delta_x in range(-1, 2):
             for delta_y in range(-1, 2):
                 new_x = self.x + self.color * delta_x
                 new_y = self.y + self.color * delta_y
-                if (delta_x == 0 and delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and \
-                        board.array[new_x][new_y] == " ":
+                if (delta_x != 0 or delta_y != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y].color != self.color:
                     moves.append([new_x, new_y])
         return moves
 
@@ -165,10 +165,10 @@ class Lance(Piece):
         temp = board.array[self.x][self.y + self.color]
         print([self.x, self.y])
         count = 1
-        while self.checkBounds(self.x, self.y) and temp.color != self.color:
+        while self.checkBounds(self.x, self.y + (count*self.color)) and temp.color != self.color:
             moves.append([self.x, self.y + (count * self.color)])
-            count += 1
             temp = board.array[self.x][self.y + (count * self.color)]
+            count += 1
             print(count)
         return moves
 
@@ -230,11 +230,12 @@ class Gold_General(Piece):  # can abreviate if you want
         moves = []
         for delta_x in range(-1, 2):
             for delta_y in range(-1, 2):
-                new_x = self.x + self.color * delta_x
-                new_y = self.y + self.color * delta_y
-                if (delta_x == 0 and delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and \
-                        board.array[new_x][new_y] != self.color:
+                new_x = self.x + (self.color * delta_x)
+                new_y = self.y + (self.color * delta_y)
+                print(new_x,new_y)
+                if (delta_x == 0 or delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] != self.color:
                     moves.append([new_x, new_y])
+        print(moves)
         return moves
 
 
@@ -295,8 +296,6 @@ class Board:  # must incrememnt turn_num after each move please please
     def __init__(self, array, string, turn_num):
         self.array = array
         self.string = string
-        """self.p1_hand = p1_hand
-        self.p2_hand = p2_hand"""
         self.turn_num = turn_num
 
     def set(self, string):  # does not load hands
@@ -397,25 +396,27 @@ class Board:  # must incrememnt turn_num after each move please please
     def movePiece(
         self, input_arr
     ):  # temp, remember to change both their x and y position in the array and their x and y position in the class
-        
-        for entry in self.array[input_arr[0][0]][input_arr[0][1]].genMoves():
-            if entry == [input_arr[1][0], input_arr[1][1]]:
-                if self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
-                    p1.hand.append(self.array[input_arr[2][3]])
-                elif self.array[input_arr[1][0]][input_arr[1][1]].color == 1:
-                    p2.hand.append(input_arr[2][3])
-                self.array[input_arr[1][0]][input_arr[1][1]] = self.array[
-                    input_arr[0][0]][input_arr[0][1]]  # moves piece
-                self.array[input_arr[1][0]][input_arr[1][1]].x = input_arr[1][
-                    0]  # sets new x
-                self.array[input_arr[1][0]][input_arr[1][1]].y = input_arr[1][
-                    1]  # sets new y
-                self.array[input_arr[0][0]][
-                    input_arr[0][1]] = Empty()  # sets old position to empty
-                self.turn_num += 1
+        print(input_arr)
+        l = self.array[input_arr[0][0]][input_arr[0][1]].genMoves()
+        if [input_arr[1][0], input_arr[1][1]] in l: # this is sort of bad on both of our parts but I will fix it later. 
+            for entry in l:
+                if entry == [input_arr[1][0], input_arr[1][1]]:
+                    if self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
+                    	p1.hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
+                    elif self.array[input_arr[1][0]][input_arr[1][1]].color == 1:
+                    	p2.hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
+                    self.array[input_arr[1][0]][input_arr[1][1]] = self.array[
+                    	input_arr[0][0]][input_arr[0][1]]  # moves piece
+                    self.array[input_arr[1][0]][input_arr[1][1]].x = input_arr[1][
+                    	0]  # sets new x
+                    self.array[input_arr[1][0]][input_arr[1][1]].y = input_arr[1][
+                    	1]  # sets new y
+                    self.array[input_arr[0][0]][
+                    	input_arr[0][1]] = Empty()  # sets old position to empty
+                    self.turn_num += 1
 
-            else:
-                print("Illegal move, please try again.")
+        else:
+            print("Illegal move, please try again.")
             # get input again
 
     def placePiece(self, piece, x, y):  # im confused reading this
