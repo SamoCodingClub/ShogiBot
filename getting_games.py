@@ -45,5 +45,4 @@ for c in collection:
 print(database)
 f = open(file, "w", newline="")
 csv_f = csv.writer(f)
-for d in database:
-    csv_f.writerow(database)
+csv_f.writerow(database)
