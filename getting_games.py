@@ -1,7 +1,7 @@
 import requests
 import csv
 home = "https://japanesechess.org/gsdb/index.php?collection="
-collection = ["meijin","ryu_o", "kisei", "oi", "oza","kio", "ginga","junisen","zen_nihon_pro","belgian_championships", "colmar", "den_haag", "dutch_championships", "european_championships", "german_open", "memorial_verkouille", "nijmegen", "rikai_sittard"] # add more from https://japanesechess.org/gsdb/ eventually
+collection = ["meijin","ryu_o", "kisei", "oi", "oza","kio", "ginga","junisen","zen_nihon_pro","belgian_championships", "colmar", "den_haag", "dutch_championships", "european_championships", "german_open", "memorial_verkouille", "nijmegen", "rikai_sittard"]
 database = []
 file = "database.csv"
 for c in collection:
@@ -11,8 +11,11 @@ for c in collection:
     boolean_value = True
     while boolean_value:
         r = requests.get(url).text
-        if "White_grade" in r: #test all of this eventually probably
-            print(r.split("Proam")[1].split(">")[1].split("<")[0].split()[-1])
+        if "White_grade" in r: #this code sucks. sue me. (i think it worked though?)
+            for x in r.split("Proam")[1].split(">")[1].split("<")[0].split():
+                for a in x:
+                    if 0<= ord(a)<=127:
+                        continue
             if r.split("Result \"")[1].split("\"")[0] == "1-0":
                 winner  = -1 #black won
             elif r.split("Result \"")[1].split("\"")[0] == "0-1":
@@ -25,7 +28,7 @@ for c in collection:
                 url = url.split("&")[0] + str("&") + "index=" + str(count)
                 continue
             elif r.split("Proam")[1].split(">")[1].split("<")[0].split()[-1] == "{Resigns}": #sometimes its not there
-                if len(r.split("Proam")[1].split(">")[1].split("<")[0].split()) % 2 == 0:
+                if len(r.split("Proam")[1].split(">")[1].split("<")[0].split()) % 2 == 0:   
                     winner = -1
                 else:
                     winner = 1
@@ -38,7 +41,7 @@ for c in collection:
             database.append([r.split("Proam")[1].split(">")[1].split("<")[0].split(), winner])
 
         else:
-            boolean_value = False
+            boolean_value = False 
         count += 1
         print(count)
         url = url.split("&")[0] + str("&") + "index=" + str(count)
