@@ -449,7 +449,7 @@ p2 = Player([])
 
 # setup with functions
 board.set(
-    "00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/17b/77r/06p/16p/26p/36p/46p/56p/66p/76p/86p"
+    "00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/77b/17r/06p/16p/26p/36p/46p/56p/66p/76p/86p"
 )
 
 
@@ -483,7 +483,7 @@ def a_literal_move(input_str):
     x2 = int(input_str[2])
     y2 = int(input_str[3])
     input_arr = [[x1, y1], [x2, y2]]
-    board.movePiece(input_arr)
+    board.checkLegality(input_arr)
     canvas.delete(f"p{x1}{y1}")
     canvas.delete(f"p{x2}{y2}")
     draw_piece(x1, y1, board.array[x1][y1])
