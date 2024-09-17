@@ -7,7 +7,7 @@ import time
 root = tk.Tk()
 
 boardSize = 20
-canvas = tk.Canvas(root, width=9 * boardSize, height=9 * boardSize, bg="white")
+canvas = tk.Canvas(root, width=500, height=300, bg="white")
 canvas.pack()
 
 for num in range(0, 10):
@@ -86,7 +86,7 @@ class King(Piece):
                         new_x, new_y
                 ) and board.array[new_x][new_y].color != self.color:
                     moves.append([new_x, new_y])
-        
+
         print(moves)
         return moves
 
@@ -402,17 +402,17 @@ class Board:  # must incrememnt turn_num after each move please please
             for entry in l:
                 if entry == [input_arr[1][0], input_arr[1][1]]:
                     if self.array[input_arr[1][0]][input_arr[1][1]].color == -1:
-                    	p1.hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
+                        p1.hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
                     elif self.array[input_arr[1][0]][input_arr[1][1]].color == 1:
-                    	p2.hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
+                        p2.hand.append(self.array[input_arr[1][0]][input_arr[1][1]])
                     self.array[input_arr[1][0]][input_arr[1][1]] = self.array[
-                    	input_arr[0][0]][input_arr[0][1]]  # moves piece
+                        input_arr[0][0]][input_arr[0][1]]  # moves piece
                     self.array[input_arr[1][0]][input_arr[1][1]].x = input_arr[1][
-                    	0]  # sets new x
+                        0]  # sets new x
                     self.array[input_arr[1][0]][input_arr[1][1]].y = input_arr[1][
-                    	1]  # sets new y
+                        1]  # sets new y
                     self.array[input_arr[0][0]][
-                    	input_arr[0][1]] = Empty()  # sets old position to empty
+                        input_arr[0][1]] = Empty()  # sets old position to empty
                     self.turn_num += 1
 
         else:
@@ -468,7 +468,7 @@ def draw_piece(x, y, p):
                font=("Ariel", 15),
                fill="black",
                tags=f"p{x}{y}")
-    
+
 
 
 def draw_board():
@@ -485,6 +485,7 @@ def a_literal_move(input_str):
     input_arr = [[x1, y1], [x2, y2]]
     board.movePiece(input_arr)
     canvas.delete(f"p{x1}{y1}")
+    canvas.delete(f"p{x2}{y2}")
     draw_piece(x1, y1, board.array[x1][y1])
     draw_piece(x2, y2, board.array[x2][y2])
 
@@ -503,18 +504,27 @@ run = True
 thing = ""
 root.bind(f"<Button-1>", click_pos)
 t = 0
+name = ""
 while run is True:
+    if board.turn_num % 2 == 0:
+        name = "ONE"
+        time = 1
+    elif board.turn_num % 2 == 1:
+        name = "TWO"
+        time = -1
+    canvas.delete("moveText")
+    canvas.create_text(boardSize * 9 + 80,
+           boardSize * (4.5),
+           text=f"PLAYER {name}'S\n      MOVE",
+           font=("Ariel", 12),
+           fill="black",
+           tags="moveText")
     root.update()
     if x != -1 and y != -1:
-        
+
         t += 1
         if t % 2 == 1:
-            if board.turn_num % 2 == 0 :
-                time = 1
-            elif board.turn_num % 2 == 1:
-                time = -1
-            
-            if board.array[x][y].color ==             time:
+            if board.array[x][y].color == time:
                 thing = f"{x}{y}"
                 print(thing)
             else:
