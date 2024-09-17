@@ -3,7 +3,7 @@ import csv
 home = "https://japanesechess.org/gsdb/index.php?collection="
 collection = ["meijin","ryu_o", "kisei", "oi", "oza","kio", "ginga","junisen","zen_nihon_pro","belgian_championships", "colmar", "den_haag", "dutch_championships", "european_championships", "german_open", "memorial_verkouille", "nijmegen", "rikai_sittard"]
 database = []
-file = "database.csv"
+file = "database.txt"
 for c in collection:
     count = 1
     print(c)
@@ -47,5 +47,8 @@ for c in collection:
         url = url.split("&")[0] + str("&") + "index=" + str(count)
 print(database)
 f = open(file, "w", newline="")
-csv_f = csv.writer(f)
-csv_f.writerow(database)
+for x in database:
+    for y in x:
+        f.write(y)
+        f.write(",")
+    f.write("\n")
