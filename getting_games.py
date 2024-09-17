@@ -1,7 +1,7 @@
 import requests
 import csv
 home = "https://japanesechess.org/gsdb/index.php?collection="
-collection = ["meijin","ryu_o", "kisei", "oi", "oza","kio", "ginga","junisen","zen_nihon_pro","belgian_championships", "colmar"] # add more from https://japanesechess.org/gsdb/ eventually
+collection = ["meijin","ryu_o", "kisei", "oi", "oza","kio", "ginga","junisen","zen_nihon_pro","belgian_championships", "colmar", "den_haag", "dutch_championships", "european_championships", "german_open", "memorial_verkouille", "nijmegen", "rikai_sittard"] # add more from https://japanesechess.org/gsdb/ eventually
 database = []
 file = "database.csv"
 for c in collection:
@@ -25,7 +25,7 @@ for c in collection:
                 url = url.split("&")[0] + str("&") + "index=" + str(count)
                 continue
             elif r.split("Proam")[1].split(">")[1].split("<")[0].split()[-1] == "{Resigns}": #sometimes its not there
-                if len(r.split("Proam")[1].split(">")[1].split("<")[0].split()) % 2 == 0:   
+                if len(r.split("Proam")[1].split(">")[1].split("<")[0].split()) % 2 == 0:
                     winner = -1
                 else:
                     winner = 1
@@ -38,7 +38,7 @@ for c in collection:
             database.append([r.split("Proam")[1].split(">")[1].split("<")[0].split(), winner])
 
         else:
-            boolean_value = False 
+            boolean_value = False
         count += 1
         print(count)
         url = url.split("&")[0] + str("&") + "index=" + str(count)
