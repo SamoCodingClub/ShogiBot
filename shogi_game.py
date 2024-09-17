@@ -146,7 +146,7 @@ class Silver_General(Piece):  # can abreviate if you want
             for delta_y in range(-1, 2):
                 new_x = self.x + self.color * delta_x
                 new_y = self.y + self.color * delta_y
-                if (delta_x != 0 or delta_y != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y].color != self.color:
+                if ((delta_x) != 0 or (delta_y) != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y].color != self.color:
                     moves.append([new_x, new_y])
         return moves
 
@@ -233,7 +233,7 @@ class Gold_General(Piece):  # can abreviate if you want
                 new_x = self.x + (self.color * delta_x)
                 new_y = self.y + (self.color * delta_y)
                 print(new_x,new_y)
-                if (delta_x == 0 or delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] != self.color:
+                if (delta_x != 0 or delta_y != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] != self.color:
                     moves.append([new_x, new_y])
         print(moves)
         return moves
