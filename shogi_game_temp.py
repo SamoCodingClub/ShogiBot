@@ -1,9 +1,8 @@
-"""IMPORTANT: notation idea: xy(piece)(spacer), ex. 12p/43k/."""
-"""why do we have main.py in github are we even using it"""
+
 import math
 import tkinter as tk
 import time
-from shogi_game.py import *
+from shogi_game import *
 
 root = tk.Tk()
 

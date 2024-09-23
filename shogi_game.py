@@ -81,13 +81,10 @@ class King(Piece):
             for delta_y in range(-1, 2):
                 new_x = self.x + (self.color * delta_x)
                 new_y = self.y + (self.color * delta_y)
-                print(new_x,new_y)
                 if (delta_x != 0 or delta_y != 0) and self.checkBounds(
                         new_x, new_y
                 ) and board.array[new_x][new_y].color != self.color:
                     moves.append([new_x, new_y])
-
-        print(moves)
         return moves
 
 
@@ -127,7 +124,6 @@ class Bishop(
                 if t == -1 and l == -1:
                     break
                 temp = board.array[self.x + t][self.y + s]
-                print(board.array)
                 count = 1
                 while self.checkBounds(self.x + (count * t),self.y + (count * s)) and temp.color != self.color:
                     moves.append([self.x + (count * t), self.y + (count * s)])
@@ -163,13 +159,11 @@ class Lance(Piece):
     def genMoves(self):
         moves = []
         temp = board.array[self.x][self.y + self.color]
-        print([self.x, self.y])
         count = 1
         while self.checkBounds(self.x, self.y + (count*self.color)) and temp.color != self.color:
             moves.append([self.x, self.y + (count * self.color)])
             temp = board.array[self.x][self.y + (count * self.color)]
             count += 1
-            print(count)
         return moves
 
     def promote(self):
@@ -232,10 +226,8 @@ class Gold_General(Piece):  # can abreviate if you want
             for delta_y in range(-1, 2):
                 new_x = self.x + (self.color * delta_x)
                 new_y = self.y + (self.color * delta_y)
-                print(new_x,new_y)
                 if (delta_x != 0 or delta_y != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] != self.color:
                     moves.append([new_x, new_y])
-        print(moves)
         return moves
 
 
@@ -359,7 +351,7 @@ class Board:  # must incrememnt turn_num after each move please please
         set_str = ""
         for y in range(9):
             for x in range(9):
-                if self.array[x][y].__class.__name__ != " ":
+                if self.array[x][y].__class__.__name__ != " ":
                     if entry > 1:
                         set_str += "/"
                     set_str += str(self.array[x][y].x) + str(
@@ -375,7 +367,7 @@ class Board:  # must incrememnt turn_num after each move please please
     def checkLegality(self, target_x, target_y, new_x,
                       new_y):  # says returns new but where is new
         original = self.createSet()
-        board.movePiece([target_x, target_y, new_x, new_y])
+        board.movePiece([[target_x, target_y], [new_x, new_y]])
         for y in range(9):
             for x in range(9):
                 if self.turn_num % 2 == 0 and self.array[x][
@@ -388,15 +380,14 @@ class Board:  # must incrememnt turn_num after each move please please
                     king_pos = [x, y]
         for y in range(9):
             for x in range(9):
-                if self.array[x][y].__class__.__name__ != " ":
-                    for entry in self[x][y].genMoves():
+                if self.array[x][y].__class__.__name__ != " " and self.array[x][y].color != self.array[king_pos[0]][king_pos[1]].color:
+                    for entry in self.array[x][y].genMoves():
                         if entry == king_pos:
                             self.set(original)
-
+                            self.turn_num-=1
     def movePiece(
         self, input_arr
     ):  # temp, remember to change both their x and y position in the array and their x and y position in the class
-        print(input_arr)
         l = self.array[input_arr[0][0]][input_arr[0][1]].genMoves()
         if [input_arr[1][0], input_arr[1][1]] in l: # this is sort of bad on both of our parts but I will fix it later. 
             for entry in l:
@@ -414,7 +405,6 @@ class Board:  # must incrememnt turn_num after each move please please
                     self.array[input_arr[0][0]][
                         input_arr[0][1]] = Empty()  # sets old position to empty
                     self.turn_num += 1
-
         else:
             print("Illegal move, please try again.")
             # get input again
@@ -459,14 +449,14 @@ def draw_piece(x, y, p):
                    boardSize * (8.5 - y),
                    text=p.__class__.__name__[0],
                    font=("Ariel", 15),
-                   fill="black",
+                   fill="blue",
                    tags=f"p{x}{y}")
     else:
         canvas.create_text(boardSize * (x + .5),
                boardSize * (8.5 - y),
                text=str.lower(p.__class__.__name__[0]),
                font=("Ariel", 15),
-               fill="black",
+               fill="red",
                tags=f"p{x}{y}")
 
 
@@ -483,9 +473,10 @@ def a_literal_move(input_str):
     x2 = int(input_str[2])
     y2 = int(input_str[3])
     input_arr = [[x1, y1], [x2, y2]]
-    board.checkLegality(input_arr)
+    board.checkLegality(x1, y1, x2, y2)
     canvas.delete(f"p{x1}{y1}")
     canvas.delete(f"p{x2}{y2}")
+    print(f"{x}{y}")
     draw_piece(x1, y1, board.array[x1][y1])
     draw_piece(x2, y2, board.array[x2][y2])
 
@@ -526,15 +517,11 @@ while run is True:
         if t % 2 == 1:
             if board.array[x][y].color == time:
                 thing = f"{x}{y}"
-                print(thing)
             else:
                 t = 0
             x, y = -1, -1
         else:
             a_literal_move(f"{thing}{x}{y}")
-            print(f"{x}{y}")
-            board.print()
             t = 0
-
 
 root.mainloop()
