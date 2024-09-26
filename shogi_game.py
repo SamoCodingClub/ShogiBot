@@ -34,209 +34,156 @@ class Player:
 
 # IMPORTANT the x and y doesn't work right now fix it later
 class Piece:
-
-    def __init__(self, color, x, y):  # -1 is black, 1 is white
-        self.color = color
-        self.x = x
-        self.y = y
-
-    def checkBounds(self, x, y):
-        if x < 0 or x > 8 or y < 0 or y > 8:
-            return False
-        else:
-            return True
-
+	def __init__(self, color, x, y): #-1 is black, 1 is white
+		self.color = color
+		self.x = x
+		self.y = y
+	
+	def checkBounds(self, x, y):
+		if x < 0 or x > 8 or y < 0 or y > 8:
+			return False
+		else:
+			return True
 
 class Empty:
-
-    def __init__(self):
-        self.color = 0
-        self.__class__.__name__ = " "
-
+	def __init__(self):
+		self.color = 0
+		self.__class__.__name__ = " "
 
 class Pawn(Piece):
-
-    def genMoves(self):
-        moves = []
-        new_y = self.y + self.color
-        if self.checkBounds(
-                self.x,
-                new_y) and board.array[self.x][new_y].color != self.color:
-            moves.append([self.x, new_y])
-        return moves
-
-    def promote(self):
-        board.array[self.x][self.y] = Gold_General(
-            self.color,
-            self.x,
-            self.y,
-        )
-
+	def genMoves(self):
+		moves = []
+		new_y = self.y + self.color
+		if self.checkBounds(self.x, new_y) and board.array[self.x][new_y].color != self.color:
+			moves.append([self.x, new_y])
+		return moves
+	
+	def promote(self):
+		board.array[self.x][self.y] = Gold_General(self.color, self.x, self.y,)
 
 class King(Piece):
-
-    def genMoves(self):
-        moves = []
-        for delta_x in range(-1, 2):
-            for delta_y in range(-1, 2):
-                new_x = self.x + (self.color * delta_x)
-                new_y = self.y + (self.color * delta_y)
-                print(new_x,new_y)
-                if (delta_x != 0 or delta_y != 0) and self.checkBounds(
-                        new_x, new_y
-                ) and board.array[new_x][new_y].color != self.color:
-                    moves.append([new_x, new_y])
-
-        print(moves)
-        return moves
-
+	def genMoves(self):
+		moves = []
+		for delta_x in range(-1, 2):
+			for delta_y in range(-1, 2):
+				new_x = self.x + self.color * delta_x
+				new_y = self.y + self.color * delta_y
+				if (delta_x != 0 and delta_y != 0) and self.checkBounds(new_x, new_y) and board.array[new_x][new_y].color != self.color:
+					moves.append([new_x, new_y])
+		return moves
 
 class Knight(Piece):
+	def __init__(self, color, x, y):
+		super().__init__(color, x, y)
+		self.__class__.__name__ = "N"  #should this be a thing
+	def genMoves(self):
+		moves = []
+		if board.array[self.x + 1][self.y + (2 * self.color)].color != self.color :
+			moves.append([self.x + 1,self.y +(2 * self.color)])
+		if board.array[self.x - 1][self.y + (2 * self.color)].color != self.color:
+			moves.append([self.x - 1,self.y + (2 * self.color)])
+		return moves
+	def promote(self):
+		board.array[self.x][self.y] = Gold_General(self.color, self.x, self.y,)
 
-    def __init__(self, color, x, y):
-        super().__init__(color, x, y)
-        self.__class__.__name__ = "N"  # should this be a thing
+class Bishop(Piece): #this is bad and all the stuff like it is bad and I am sorry for that add checkBounds so that it actually does something
+	def genMoves(self):
+		moves = []
+		l = [-1, 1]
+		for t in l:
+			for s in l:
+				if t == -1 and s == -1:
+					break
+				temp = board.array[self.x + t][self.y + s]
+				count = 1
+				while self.checkBounds(self.x + (count*t), self.y + (count*s)) and temp.color != self.color:
+					moves.append([self.x + (count * t), self.y + (count * s)])
+					temp = board.array[self.x + (count * t)][self.y + (count * s)]
+					count += 1
+		return moves
+		
+	def promote(self):
+		board.array[self.x][self.y] = Dragon_Horse(self.color, self.x, self.y)
 
-    def genMoves(self):
-        moves = []
-        if board.array[self.x + 1][self.y +
-                                   (2 * self.color)].color != self.color:
-            moves.append([self.x + 1, self.y + (2 * self.color)])
-        if board.array[self.x - 1][self.y +
-                                   (2 * self.color)].color != self.color:
-            moves.append([self.x - 1, self.y + (2 * self.color)])
-        return moves
-
-    def promote(self):
-        board.array[self.x][self.y] = Gold_General(
-            self.color,
-            self.x,
-            self.y,
-        )
-
-
-class Bishop(
-        Piece
-):  # this is bad and all the stuff like it is bad and I am sorry for that add checkBounds so that it actually does something
-
-    def genMoves(self):
-        moves = []
-        l = [-1, 1]
-        for t in l:
-            for s in l:
-                if t == -1 and l == -1:
-                    break
-                temp = board.array[self.x + t][self.y + s]
-                print(board.array)
-                count = 1
-                while self.checkBounds(self.x + (count * t),self.y + (count * s)) and temp.color != self.color:
-                    moves.append([self.x + (count * t), self.y + (count * s)])
-                    temp = board.array[self.x + (count * t)][self.y + (count * s)]
-                    count += 1
-        return moves
-
-    def promote(self):
-        board.array[self.x][self.y] = Dragon_Horse(self.color, self.x, self.y)
-
-
-class Silver_General(Piece):  # can abreviate if you want
-    def genMoves(self):
-        moves = []
-        for delta_x in range(-1, 2):
-            for delta_y in range(-1, 2):
-                new_x = self.x + self.color * delta_x
-                new_y = self.y + self.color * delta_y
-                if ((delta_x) != 0 or (delta_y) != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y].color != self.color:
-                    moves.append([new_x, new_y])
-        return moves
-
-    def promote(self):
-        board.array[self.x][self.y] = Gold_General(
-            self.color,
-            self.x,
-            self.y,
-        )
-
+class Silver_General(Piece): #can abreviate if you want
+	def genMoves(self):
+		moves = []
+		for delta_x in range(-1, 2):
+			for delta_y in range(-1, 2):
+				new_x = self.x + self.color * delta_x
+				new_y = self.y + self.color * delta_y
+				if (delta_x == 0 and delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] == ".":
+					moves.append([new_x, new_y])
+		return moves
+	
+	def promote(self):
+		board.array[self.x][self.y] = Gold_General(self.color, self.x, self.y,)
 
 class Lance(Piece):
-
-    def genMoves(self):
-        moves = []
-        temp = board.array[self.x][self.y + self.color]
-        print([self.x, self.y])
-        count = 1
-        while self.checkBounds(self.x, self.y + (count*self.color)) and temp.color != self.color:
-            moves.append([self.x, self.y + (count * self.color)])
-            temp = board.array[self.x][self.y + (count * self.color)]
-            count += 1
-            print(count)
-        return moves
-
-    def promote(self):
-        board.array[self.x][self.y] = Gold_General(
-            self.color,
-            self.x,
-            self.y,
-        )
-
-
+	def genMoves(self):
+		moves = []
+		temp = board.array[self.x][self.y+self.color]
+		print([self.x,self.y])
+		count = 1
+		while self.checkBounds(self.x,self.y+(count*self.color)) and temp.color != self.color:
+			moves.append([self.x,self.y + (count*self.color)])
+			count += 1     
+			temp = board.array[self.x][self.y + (count*self.color)]
+			print(count)
+		return moves
+		
+	def promote(self): 
+		board.array[self.x][self.y] = Gold_General(self.color, self.x, self.y,)
+			
+			 
 class Rook(Piece):
+	def genMoves(self):
+		moves = []
+		temp = [self.x, self.y]
+		l = [-1, 1]
+		for x in l:
+			count = 1
+			if self.checkBounds(self.x, self.y + (count*x)):
+				temp = board.array[self.x][self.y+(count*x)]
+			while self.checkBounds(self.x, self.y + (x*count)):
+					temp = board.array[self.x][self.y + (count*x)]
+					if temp.color != self.color:
+						moves.append([self.x,self.y + (x*count)])
+						count += 1
+					else:
+						break
+			count = 1
+			if self.checkBounds(self.x+(count*x), self.y):
+				temp = board.array[self.x+(count*x)][self.y]
+			while self.checkBounds(self.x+(count*x),self.y):
+				temp = board.array[self.x+(count*x)][self.y]
+				if temp.color != self.color:
+					moves.append([self.x + (x*count),self.y])
+					count += 1
+				else:
+					break
+		for delta_x in range(-1, 2):
+			for delta_y in range(-1, 2):
+				new_x = self.x + self.color * delta_x
+				new_y = self.y + self.color * delta_y
+				if (delta_x != 0 and delta_y != 0) and self.checkBounds(new_x, new_y) and board.array[new_x][new_y].color != self.color and [new_x,new_y] not in moves:
+					moves.append([new_x, new_y])
+		return moves
+		
+		def promote(self):
+			board.array[self.x][self.y] = Dragon_King(self.color, self.x, self.y)
 
-    def genMoves(self):
-        moves = []
-        temp = [self.x, self.y]
-        l = [-1, 1]
-        for x in l:
-            count = 1
-            if self.checkBounds(self.x, self.y + (count * x)):
-                temp = board.array[self.x][self.y + (count * x)]
-            while self.checkBounds(self.x, self.y + (x * count)):
-                temp = board.array[self.x][self.y + (count * x)]
-                if temp.color != self.color:
-                    moves.append([self.x, self.y + (x * count)])
-                    count += 1
-                else:
-                    break
-            count = 1
-            if self.checkBounds(self.x + (count * x), self.y):
-                temp = board.array[self.x + (count * x)][self.y]
-            while self.checkBounds(self.x + (count * x), self.y):
-                temp = board.array[self.x + (count * x)][self.y]
-                if temp.color != self.color:
-                    moves.append([self.x + (x * count), self.y])
-                    count += 1
-                else:
-                    break
-        for delta_x in range(-1, 2):
-            for delta_y in range(-1, 2):
-                new_x = self.x + self.color * delta_x
-                new_y = self.y + self.color * delta_y
-                if (delta_x != 0 and delta_y != 0) and self.checkBounds(
-                        new_x, new_y
-                ) and board.array[new_x][new_y].color != self.color and [
-                        new_x, new_y
-                ] not in moves:
-                    moves.append([new_x, new_y])
-        return moves
+class Gold_General(Piece): #can abreviate if you want
+	def genMoves(self):
+		moves = []
+		for delta_x in range(-1, 2):
+			for delta_y in range(-1, 2):
+				new_x = self.x + self.color * delta_x
+				new_y = self.y + self.color * delta_y
+				if (delta_x == 0 and delta_y == -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y]!= self.color:
+					moves.append([new_x, new_y])
+		return moves
 
-        def promote(self):
-            board.array[self.x][self.y] = Dragon_King(self.color, self.x,
-                                                      self.y)
-
-
-class Gold_General(Piece):  # can abreviate if you want
-
-    def genMoves(self):
-        moves = []
-        for delta_x in range(-1, 2):
-            for delta_y in range(-1, 2):
-                new_x = self.x + (self.color * delta_x)
-                new_y = self.y + (self.color * delta_y)
-                print(new_x,new_y)
-                if (delta_x != 0 or delta_y != -1) and delta_y != 0 and self.checkBounds(new_x, new_y) and board.array[new_x][new_y] != self.color:
-                    moves.append([new_x, new_y])
-        print(moves)
-        return moves
 
 
 # might be broken
@@ -359,7 +306,8 @@ class Board:  # must incrememnt turn_num after each move please please
         set_str = ""
         for y in range(9):
             for x in range(9):
-                if self.array[x][y].__class.__name__ != " ":
+                print(self.array[x][y])
+                if self.array[x][y].__class__.__name__ != " ":
                     if entry > 1:
                         set_str += "/"
                     set_str += str(self.array[x][y].x) + str(
@@ -375,7 +323,7 @@ class Board:  # must incrememnt turn_num after each move please please
     def checkLegality(self, target_x, target_y, new_x,
                       new_y):  # says returns new but where is new
         original = self.createSet()
-        board.movePiece([target_x, target_y, new_x, new_y])
+        board.movePiece([[target_x, target_y], [new_x, new_y]])
         for y in range(9):
             for x in range(9):
                 if self.turn_num % 2 == 0 and self.array[x][
@@ -389,9 +337,10 @@ class Board:  # must incrememnt turn_num after each move please please
         for y in range(9):
             for x in range(9):
                 if self.array[x][y].__class__.__name__ != " ":
-                    for entry in self[x][y].genMoves():
+                    for entry in self.array[x][y].genMoves():
                         if entry == king_pos:
                             self.set(original)
+                            self.turn_num-=1
 
     def movePiece(
         self, input_arr
@@ -483,7 +432,7 @@ def a_literal_move(input_str):
     x2 = int(input_str[2])
     y2 = int(input_str[3])
     input_arr = [[x1, y1], [x2, y2]]
-    board.checkLegality(input_arr)
+    board.checkLegality(x1,y1,x2,y2)
     canvas.delete(f"p{x1}{y1}")
     canvas.delete(f"p{x2}{y2}")
     draw_piece(x1, y1, board.array[x1][y1])
