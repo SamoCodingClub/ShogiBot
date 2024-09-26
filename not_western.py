@@ -49,9 +49,9 @@ class Board: #KEEP SEPERATE FROM SHOGI_GAME BOARD THEY ARE DIFFERENT SO DO NOT T
 	def movePiece(self, x1, y1, x2, y2):
 		if self.array[x2][y2] != ".":
 			if self.num_turn %2 == 0:
-				board.p1.append(self.array[x2][y2])
+				self.p1.append(self.array[x2][y2])
 			else:
-				board.p2.append(self.array[x2][y2])
+				self.p2.append(self.array[x2][y2])
 		self.array[x2][y2] = self.array[x1][y1]
 		self.array[x1][y1] = "."
 		print(self.array[x2][y2])
@@ -99,20 +99,26 @@ def reencode(src, dst):
 					outputfp.write("/")
 					outputfp.write("^")
 					count = 0
-					for x in board.p1:
-						if count == 0:
-							outputfp.write("!")
-							count += 1
-						outputfp.write(x)
-						outputfp.write("/")
-					count = 0
-					for x in board.p2:
-						if count == 0:
-							outputfp.write("!")
-							count += 1
-						outputfp.write("?")
-						outputfp.write(x)
-						outputfp.write("/")
+					if len(board.p1) > 0: #delete this len stuff later
+						for entry in board.p1:
+							if type(entry) != type("lkjdsfjdsafds"):
+								continue
+							if count == 0:
+								outputfp.write("!")
+								count += 1
+							outputfp.write(entry)
+							outputfp.write("/")
+						count = 0
+					if len(board.p2) > 0: #delete this len stuffl ater
+						for entry in board.p2:
+							if type(entry) != type("lkjdsfjdsafds"):
+								continue
+							if count == 0:
+								outputfp.write("!")
+								count += 1
+							outputfp.write("?")
+							outputfp.write(entry)
+							outputfp.write("/")
 					outputfp.write(game[-1][:-1])
 					outputfp.write("\n")
 				except:
@@ -120,4 +126,4 @@ def reencode(src, dst):
 	print("Reencode Complete")
 	
 
-reencode('./database.txt', './shogi/ShogiBot/games_I_think') #put files here please. here
+reencode('./database.txt', './games_I_think') #put files here please. here

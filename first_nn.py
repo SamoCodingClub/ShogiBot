@@ -3,10 +3,11 @@ from torch import nn
 import pathlib
 import pandas as pd
 import random
-class deepish(nn.Module):
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+class cnn(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Conv2d(48,20,kernal_size = (10, 3, 3)) #idk if this is any good but we will see
+        self.fc1 = nn.Conv2d(48,20,kernel_size = (10, 3, 3)) #idk if this is any good but we will see
         self.r = nn.ReLu()
         self.m = MaxPool2d(2,2) #this architecture is def messed up will fix later
         self.fc2 = nn.Conv2d(20, 2, 2)
@@ -67,12 +68,13 @@ class Board: #should import fom shogi_game but have to control code in there so 
                     "There was an error with setting the board. The issue was with:",
                     entry)
 #note to self to make sure lowercase is black. no biggie if not tho
-model = deepish()
+model = cnn()
 num_epochs = 5
 optimizer = torch.optim.Adam(model.parameters(), lr = 0.002)
 loss = nn.CrossEntropyLoss()
-for numberoftimesthishappens in range(int(sum(1 for _ in open(pathlib.Path(__file__).parent/'games_I_think'))/1000)):
-    file = open(pathlib.Path(__file__).parent/'games_I_think') #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
+test_dataset = []
+for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/1000)):
+    file = open('./games_I_think') #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
     data = pd.read_csv(file, skiprows = 1000 * numberoftimesthishappens, nrows = 1000,delimiter = "/") #pandas is smart
 
     #board.set("data")
@@ -137,9 +139,9 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open(pathlib.Path(__fil
     finTensor = torch.Tensor(data.iloc[:,:-1])
     y = torch.Tensor(data.iloc[:,-1:])
     data = data_utils.TensorDataset(finTensor,y)
-    trains,tests=torch.utils.data(random_split(data,[int(len(data)*0.8),len(data)-int(len(data)*0.8)])) #idk why I didn't just use variables for this. I will probably clean it up later
+    trains,tests=(torch.utils.data.random_split(data,[int(len(data)*0.8),len(data)-int(len(data)*0.8)])) #idk why I didn't just use variables for this. I will probably clean it up later
     train_loader = data_utils.DataLoader(trains, batch_size=200, shuffle=True, drop_last = True)
-    test_loader = data_utils.DataLoader(tests, batch_size=200, shuffle=True, drop_last = True)
+    test_dataset.append(tests)
     
     for epoch in range(num_epochs):
         train_batch = iter(train_loader)
@@ -156,3 +158,6 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open(pathlib.Path(__fil
             optimizer.step()
             print(loss)
     torch.save(model.state_dict(), str(numberoftimesthishappens)+ "badnn.pt")
+with open("testing", r) as f:
+	f.writelines(test_dataset)
+
