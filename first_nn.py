@@ -8,8 +8,8 @@ class cnn(nn.Module):
     def __init__(self):
         super().__init__()
         self.fc1 = nn.Conv2d(48,20,kernel_size = (10, 3, 3)) #idk if this is any good but we will see
-        self.r = nn.ReLu()
-        self.m = MaxPool2d(2,2) #this architecture is def messed up will fix later
+        self.r = nn.ReLU()
+        self.m = nn.MaxPool2d(2,2) #this architecture is def messed up will fix later
         self.fc2 = nn.Conv2d(20, 2, 2)
         self.l1 = nn.Linear(16 * 5 * 5, 120)
         self.l2 = nn.Linear(120, 84)
@@ -27,7 +27,7 @@ class Board: #should import fom shogi_game but have to control code in there so 
         self.array = array
         self.string = string
         self.p1 = p1
-		self.p2 = p2
+        self.p2 = p2
 
     def set(self, string):
         self.array = [[Empty() for y in range(9)] for x in range(9)]
@@ -75,8 +75,9 @@ loss = nn.CrossEntropyLoss()
 test_dataset = []
 for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/1000)):
     file = open('./games_I_think') #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
-    data = pd.read_csv(file, skiprows = 1000 * numberoftimesthishappens, nrows = 1000,delimiter = "/") #pandas is smart
-
+    data = pd.DataFrame(file)
+    print(data)
+    #int(sum(1 for _ in open('./games_I_think'))/1000)
     #board.set("data")
     #board.print()
     bigarray = []

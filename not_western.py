@@ -1,5 +1,7 @@
 """
 IMPORTANT. PLEASE READ
+The file was not directly put from getting_games into here. It was cleaned using manual find and replace. This process was fast enough (about 30 seconds) to be deemed unnecessary to right code for. Just so you know. 
+
 hands are not being stored, so I guess you can choose the format in which to store them. I suggest something like (position)/(position)\(thing in hand)\(thing in hand)/-1 or something I really dont know
 
 
@@ -49,31 +51,37 @@ class Board: #KEEP SEPERATE FROM SHOGI_GAME BOARD THEY ARE DIFFERENT SO DO NOT T
 	def movePiece(self, x1, y1, x2, y2):
 		if self.array[x2][y2] != ".":
 			if self.num_turn %2 == 0:
-				self.p1.append(self.array[x2][y2])
+				self.p1.append(self.array[x2][y2].upper())
+
 			else:
-				self.p2.append(self.array[x2][y2])
+				try:
+					self.p2.append(self.array[x2][y2].upper())
+				except:
+					print(self.array)
+		
 		self.array[x2][y2] = self.array[x1][y1]
 		self.array[x1][y1] = "."
-		print(self.array[x2][y2])
 	def placePiece(self, x, y, piece):
 		self.array[x][y] = piece
 	
 	def promotePiece(self, piece):
-		match piece:
-			case "p":
+		if self.num_turn % 2 == 0:
+			if piece == "P" or piece == "L" or piece == "S" or piece == "N" or  piece == "P":
 				return "g"
-			case "l":
-				return "g"
-			case "s":
-				return "g"
-			case "n":
-				return "g"
-			case "b":
+			elif piece == "B":
 				return "h"
-			case "r":
+			elif piece == "R":
 				return "d"
+		else:
+			if piece == "P" or piece == "L" or piece == "S" or piece == "N" or  piece == "P":
+				return "G"
+			elif piece == "B":
+				return "H"
+			elif piece == "R":
+				return "D"
 
 def reencode(src, dst):
+	pieces = ["p", "n", "l", "g", "k", "s", "r", "b", "h", "d"]
 	letter_num = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7, "i":8}
 	temp_array = []
 	
@@ -83,23 +91,51 @@ def reencode(src, dst):
 			inp = line[:-1]
 			temp_array.append(inp.split(", "))
 		#turn array into text that sets up a board, add to file
+		g = 0
 		for game in temp_array:
 			board = Board([], "")
+			
+			fthem = False
+			asq = 0
 			board.set("00L/10N/20S/30G/40K/50G/60S/70N/80L/11B/71R/02P/12P/22P/32P/42P/52P/62P/72P/82P/08l/18n/28s/38g/48k/58g/68s/78n/88l/17b/77r/06p/16p/26p/36p/46p/56p/66p/76p/86p")
 			for move in game:
+				asq+=1
+				#print(board.array)
 				try:
+					print(board.array)
+					if fthem and "}" in move:
+						fthem = False
+					elif fthem:
+						continue
+					if "{" in move:
+						fthem = True
 					if move[-1] == "+":
-						board.placePiece(abs(int(move[4]) - 9), letter_num[move[5]], board.promotePiece(move[1]))
-						board.num_turn += 1
-					elif move[0]:
+						print(board.promotePiece(move[0]))
+						board.placePiece(abs(int(move[1]) - 9), letter_num[move[2]], board.promotePiece(move[0]))
+						print(board.array)
+						print("ak")
 						board.movePiece(abs(int(move[1]) - 9), letter_num[move[2]], abs(int(move[4]) - 9), letter_num[move[5]])
 						board.num_turn += 1
+					elif move[0].lower() in pieces:
+						print(asq)
+						board.movePiece(abs(int(move[1]) - 9), letter_num[move[2]], abs(int(move[4]) - 9), letter_num[move[5]])
+						board.num_turn += 1
+					elif move[1] == "*": #they use proper notation for 
+						if board.num_turn %2 == 0:
+							board.p1.pop(board.p1.index(move[0]))
+						else:
+							board.p1.pop(board.p1.index(move[0]))
+						if board.num_turn % 2 == 0:
+							board.placePiece(abs(int(move[1]) - 9),letter_num[move[2]], letter_num(move[0]).lower())
+						else:
+							board.placePiece(abs(int(move[1]) - 9),letter_num[move[2]], letter_num(move[0]).upper())
+						board.num_turn+=1
 					new_board = board.createSet()
 					outputfp.write(new_board)
 					outputfp.write("/")
 					outputfp.write("^")
 					count = 0
-					if len(board.p1) > 0: #delete this len stuff later
+					if len(board.p1) > 0: #delete this len stuff later it doesnt even do anything
 						for entry in board.p1:
 							if type(entry) != type("lkjdsfjdsafds"):
 								continue
@@ -122,7 +158,8 @@ def reencode(src, dst):
 					outputfp.write(game[-1][:-1])
 					outputfp.write("\n")
 				except:
-					print("\nerror with:", move)
+					print("error", move)
+			g += 1
 	print("Reencode Complete")
 	
 
