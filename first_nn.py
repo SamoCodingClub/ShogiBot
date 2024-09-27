@@ -21,52 +21,26 @@ class cnn(nn.Module):
         a = self.r(a)
         a = self.l2(self.l1(a))
         return a
+class Empty:
+	def __init__(self):
+		self.color = 0
+		self.__class__.__name__ = " "
 class Board: #should import fom shogi_game but have to control code in there so that it doesnt run on import. will do later.
 
-    def __init__(self, array, string, p1, p2):
+    def __init__(self, array, string):
         self.array = array
         self.string = string
-        self.p1 = p1
-        self.p2 = p2
+        self.p1 = []
+        self.p2 = []
 
-    def set(self, string):
-        self.array = [[Empty() for y in range(9)] for x in range(9)]
-        input_arr = string.split("/")
-        for entry in input_arr:
-            try:
-                if entry.islower():
-                    color = -1
-                else:
-                    color = 1
-                entry = entry.lower()
-                if "p" in entry: 
-                    self.array[int(entry[0])][int(entry[1])] = Pawn(
-                        color, int(entry[0]), int(entry[1]))
-                elif "k" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = King(
-                        color, int(entry[0]), int(entry[1]))
-                elif "s" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = Silver_General(
-                        color, int(entry[0]), int(entry[1]))
-                elif "r" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = Rook(
-                        color, int(entry[0]), int(entry[1]))
-                elif "b" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = Bishop(
-                        color, int(entry[0]), int(entry[1]))
-                elif "g" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = Gold_General(
-                        color, int(entry[0]), int(entry[1]))
-                elif "n" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = Knight(
-                        color, int(entry[0]), int(entry[1]))
-                elif "l" in entry:
-                    self.array[int(entry[0])][int(entry[1])] = Lance(
-                        color, int(entry[0]), int(entry[1]))
-            except:
-                print(
-                    "There was an error with setting the board. The issue was with:",
-                    entry)
+    def set(self, string): #does not load hands
+            self.array = [["." for y in range(9)] for x in range(9)]
+            input_arr = string.split("/")
+            for entry in input_arr:
+                try:
+                    self.array[int(entry[0])][int(entry[1])] = entry[2]
+                except:
+                    print("There was an error with setting the board. The issue was with:", entry)
 #note to self to make sure lowercase is black. no biggie if not tho
 model = cnn()
 num_epochs = 5
@@ -76,57 +50,65 @@ test_dataset = []
 for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/1000)):
     file = open('./games_I_think') #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
     data = pd.DataFrame(file)
-    print(data)
     #int(sum(1 for _ in open('./games_I_think'))/1000)
     #board.set("data")
     #board.print()
     bigarray = []
     smallarray = []
     pieces = ["p", "n", "l", "g", "k", "s", "r", "b", "h", "d"]
-    for pieceofdata in data:
-        board = Board([], "", 0) #why do we change from board array to the set stuff just to change it back later. This is dumb, but i guess its fine for now.
-        moves = pieceofdata.split("^")[0]
-        hand = pieceofdata.split("^")[1]
+
+    for pieceofdata in data.index:
+        board = Board([], "") #why do we change from board array to the set stuff just to change it back later. This is dumb, but i guess its fine for now.
+        moves = data[0][pieceofdata].split("^")[0]
+        hand = data[0][pieceofdata].split("^")[1]
         hand1 = []
         hand2 = []
-        winner = pieceofdata.split("^")[:-2]
+        winner = data[0][pieceofdata].split("^")[:-2]
         if "/" in winner:
             winner = winner[1]
         smallarray.append(winner)
+        print(pieceofdata)
         board.set(moves[:-1])
         arr = [[[0 for b in range(9)]for a in range(9)] for c in range(48)] #this looks funny
         for i,y in enumerate(board.array): #clean this code up later, but it gets the pieces in the array
             for z,x in enumerate(y):
-                if x.color != 0:
-                    p = board.array[i][z].__class__.__name__
+                if x != ".":
+                    p = board.array[i][z]
                     if p[0].isupper():
-                        arr[pieces.index(p)][i][z] = 1
+                        arr[pieces.index(p.lower())][i][z] = 1
                     else:
                         arr[pieces.index(p) + 10][i][z] = 1
         if "!" in hand: #this is because of dumb decisions
-            hand1 = hand.split("&")[0]
-            hand1 = hand.split("/")
+            hand1 = hand[1:]
+            hand1 = hand1.split("&")[0]
+            hand1 = hand1.split("/") #THIS HAS EMPTY SPOTS IN THE LIST
+            print(hand1)
+
         if "?" in hand:
-            hand2 = hand.split("@")[0]
-            hand2 = hand.split("/")
-        for x in hand1:
-            for w in range(9):
-                for e in range(4):
-                    arr[pieces.index(x)+20][w][e] = 1
-            q = hand1.pop(hand1.index(x)) #i just wrote code probably check later
-            if q in hand1:
-                for r in range(9):
-                    for t in range(5):
-                        arr[pieces.index(p)+20][w][e] = 1
+            hand2 = hand[hand.index("?")+1:]
+            hand2 = hand2.split("@")[0]
+            hand2 = hand2.split("/")
+            print(hand2)
+        for x in hand1: 
+            if x != "":
+                for w in range(9):
+                    for e in range(4):
+                        arr[pieces.index(x.lower())+20][w][e] = 1 
+                q = hand1.pop(hand1.index(x)) #i just wrote code probably check later
+                if q in hand1:
+                    for r in range(9):
+                        for t in range(5):
+                            arr[pieces.index(p.lower())+20][w][e] = 1
         for x in hand2:
-            for w in range(9):
-                for e in range(4):
-                    arr[pieces.index(x)+20][w][e] = 1
-            q = hand2.pop(hand2.index(x))
-            if q in hand2:
-                for r in range(9):
-                    for t in range(5):
-                        arr[pieces.index(p)+20][w][e] = 1
+            if x != "":
+                for w in range(9):
+                    for e in range(4):
+                        arr[pieces.index(x.lower())+20][w][e] = 1
+                q = hand2.pop(hand2.index(x))
+                if q in hand2:
+                    for r in range(9):
+                        for t in range(5):
+                            arr[pieces.index(p.lower())+20][w][e] = 1
         bigarray.append(arr)
     data = pd.concat([bigarray, smallarray], ignore_index = False)
     data["winner"] = data.iloc[:, -1:]

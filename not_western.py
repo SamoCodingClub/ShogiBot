@@ -135,26 +135,27 @@ def reencode(src, dst):
 					outputfp.write("/")
 					outputfp.write("^")
 					count = 0
-					if len(board.p1) > 0: #delete this len stuff later it doesnt even do anything
-						for entry in board.p1:
-							if type(entry) != type("lkjdsfjdsafds"):
-								continue
-							if count == 0:
-								outputfp.write("!")
-								count += 1
-							outputfp.write(entry)
-							outputfp.write("/")
-						count = 0
-					if len(board.p2) > 0: #delete this len stuffl ater
-						for entry in board.p2:
-							if type(entry) != type("lkjdsfjdsafds"):
-								continue
-							if count == 0:
-								outputfp.write("!")
-								count += 1
+					for entry in board.p1:
+						if type(entry) != type("lkjdsfjdsafds"):
+							continue
+						if count == 0:
+							outputfp.write("!")
+							count += 1
+						outputfp.write(entry)
+						outputfp.write("/")
+					if count ==1:		
+						outputfp.write("&")
+					count = 0
+					for entry in board.p2:
+						if type(entry) != type("lkjdsfjdsafds"):
+							continue
+						if count == 0:
 							outputfp.write("?")
-							outputfp.write(entry)
-							outputfp.write("/")
+							count += 1
+						outputfp.write(entry)
+						outputfp.write("/")
+					if count == 1:
+						outputfp.write("@")
 					outputfp.write(game[-1][:-1])
 					outputfp.write("\n")
 				except:
