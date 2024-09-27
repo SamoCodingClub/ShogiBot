@@ -1,8 +1,10 @@
 import torch
+import torch.utils.data
 from torch import nn
 import pathlib
 import pandas as pd
 import random
+import itertools
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class cnn(nn.Module):
     def __init__(self):
@@ -48,8 +50,12 @@ optimizer = torch.optim.Adam(model.parameters(), lr = 0.002)
 loss = nn.CrossEntropyLoss()
 test_dataset = []
 for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/1000)):
-    file = open('./games_I_think') #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
-    data = pd.DataFrame(file)
+    data = []
+    with open("./games_I_think", "r") as f: #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
+        for line in itertools.islice(f, numberoftimesthishappens*1000,(numberoftimesthishappens*1000)+1000):
+            data.append(line)
+    print(data)
+    data = pd.DataFrame(data)
     #int(sum(1 for _ in open('./games_I_think'))/1000)
     #board.set("data")
     #board.print()
@@ -110,6 +116,9 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
                         for t in range(5):
                             arr[pieces.index(p.lower())+20][w][e] = 1
         bigarray.append(arr)
+    bigarray = pd.DataFrame(bigarray)
+    smallarray = pd.DataFrame(smallarray)
+    print(bigarray)
     data = pd.concat([bigarray, smallarray], ignore_index = False)
     data["winner"] = data.iloc[:, -1:]
     df_min = data[data["winner"] == 1] #white wins
@@ -119,11 +128,12 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         r = random.randrange(0, len(df_maj) -1)
         df_maj[r].drop
     data = pd.concat([df_maj, df_min], ignore_index = True)
+    print(data)
     finTensor = torch.Tensor(data.iloc[:,:-1])
-    y = torch.Tensor(data.iloc[:,-1:])
-    data = data_utils.TensorDataset(finTensor,y)
+    y = torch.Tensor(data.iloc[:,-1:]) #this is all dumb fix later
+    data = torch.utils.data.TensorDataset(finTensor,y)
     trains,tests=(torch.utils.data.random_split(data,[int(len(data)*0.8),len(data)-int(len(data)*0.8)])) #idk why I didn't just use variables for this. I will probably clean it up later
-    train_loader = data_utils.DataLoader(trains, batch_size=200, shuffle=True, drop_last = True)
+    train_loader = torch.utils.data.DataLoader(trains, batch_size=200, shuffle=True, drop_last = True)
     test_dataset.append(tests)
     
     for epoch in range(num_epochs):
