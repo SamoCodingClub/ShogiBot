@@ -71,8 +71,12 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         hand2 = []
         winner = data[0][pieceofdata].split("^")[1][-3:-1]
 
-        if "/" in winner:
-            winner = winner[1]
+        if "1" in winner:
+            winner = -1
+        elif "0" in winner:
+            winner = 0
+        elif "-1" in winner:
+            winner = -1
         smallarray.append(winner)
         board.set(moves[:-1])
         arr = [[[0 for b in range(9)]for a in range(9)] for c in range(48)] #this looks funny
@@ -122,7 +126,6 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
     data = bigarray
     data = pd.DataFrame(data)
     data["winner"] = data.iloc[:, -1:]
-    print(data["winner"])
     df_min = data.loc[data["winner"] == 1] #white wins
     df_maj = data.loc[data["winner"] == -1]
     print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
