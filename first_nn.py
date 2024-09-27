@@ -69,11 +69,11 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         hand = data[0][pieceofdata].split("^")[1]
         hand1 = []
         hand2 = []
-        winner = data[0][pieceofdata].split("^")[:-2]
+        winner = data[0][pieceofdata].split("^")[1][-3:-1]
+
         if "/" in winner:
             winner = winner[1]
         smallarray.append(winner)
-        print(pieceofdata)
         board.set(moves[:-1])
         arr = [[[0 for b in range(9)]for a in range(9)] for c in range(48)] #this looks funny
         for i,y in enumerate(board.array): #clean this code up later, but it gets the pieces in the array
@@ -88,13 +88,11 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
             hand1 = hand[1:]
             hand1 = hand1.split("&")[0]
             hand1 = hand1.split("/") #THIS HAS EMPTY SPOTS IN THE LIST
-            print(hand1)
 
         if "?" in hand:
             hand2 = hand[hand.index("?")+1:]
             hand2 = hand2.split("@")[0]
             hand2 = hand2.split("/")
-            print(hand2)
         for x in hand1: 
             if x != "":
                 for w in range(9):
@@ -118,17 +116,20 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         bigarray.append(arr)
     bigarray = pd.DataFrame(bigarray)
     smallarray = pd.DataFrame(smallarray)
+    print(smallarray)
     print(bigarray)
-    data = pd.concat([bigarray, smallarray], ignore_index = False)
+    bigarray[48] = smallarray
+    data = bigarray
+    data = pd.DataFrame(data)
     data["winner"] = data.iloc[:, -1:]
-    df_min = data[data["winner"] == 1] #white wins
-    df_maj = data[data["winner"] == -1]
-    print(len(df_maj)) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    print(data["winner"])
+    df_min = data.loc[data["winner"] == 1] #white wins
+    df_maj = data.loc[data["winner"] == -1]
+    print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     while len(df_maj) > len(df_min): #downsampling, but this is going to gerrymander when i turn it into batches so probably find a better way to do it. 
         r = random.randrange(0, len(df_maj) -1)
         df_maj[r].drop
     data = pd.concat([df_maj, df_min], ignore_index = True)
-    print(data)
     finTensor = torch.Tensor(data.iloc[:,:-1])
     y = torch.Tensor(data.iloc[:,-1:]) #this is all dumb fix later
     data = torch.utils.data.TensorDataset(finTensor,y)

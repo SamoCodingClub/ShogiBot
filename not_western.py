@@ -156,6 +156,7 @@ def reencode(src, dst):
 						outputfp.write("/")
 					if count == 1:
 						outputfp.write("@")
+					outputfp.write("/")
 					outputfp.write(game[-1][:-1])
 					outputfp.write("\n")
 				except:
