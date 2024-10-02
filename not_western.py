@@ -142,7 +142,7 @@ def reencode(src, dst):
 							outputfp.write("!")
 							count += 1
 						outputfp.write(entry)
-						outputfp.write("/")
+						outputfp.write("/")asd 
 					if count ==1:		
 						outputfp.write("&")
 					count = 0
