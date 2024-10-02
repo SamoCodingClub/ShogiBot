@@ -72,7 +72,7 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         winner = data[0][pieceofdata].split("^")[1][-3:-1]
 
         if "1" in winner:
-            winner = -1
+            winner = 1
         elif "0" in winner:
             winner = 0
         elif "-1" in winner:
@@ -120,21 +120,26 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         bigarray.append(arr)
     bigarray = pd.DataFrame(bigarray)
     smallarray = pd.DataFrame(smallarray)
-    print(smallarray)
-    print(bigarray)
+    #print(smallarray)
+    #print(bigarray)
     bigarray[48] = smallarray
+    
     data = bigarray
+
     data = pd.DataFrame(data)
-    data["winner"] = data.iloc[:, -1:]
-    df_min = data.loc[data["winner"] == 1] #white wins
-    df_maj = data.loc[data["winner"] == -1]
-    print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    #data["winner"] = data.iloc[:, -1:]
+    #print(data)
+    df_min = data.loc[data[48] == 1] #white wins
+    print(df_min)
+    df_maj = data.loc[data[48] == -1]
+    #print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     while len(df_maj) > len(df_min): #downsampling, but this is going to gerrymander when i turn it into batches so probably find a better way to do it. 
         r = random.randrange(0, len(df_maj) -1)
         df_maj[r].drop
+
     data = pd.concat([df_maj, df_min], ignore_index = True)
-    finTensor = torch.Tensor(data.iloc[:,:-1])
-    y = torch.Tensor(data.iloc[:,-1:]) #this is all dumb fix later
+    finTensor = torch.Tensor(data.columns[-1])
+    y = torch.Tensor(data.columns[:-1]) #this is all dumb fix later
     data = torch.utils.data.TensorDataset(finTensor,y)
     trains,tests=(torch.utils.data.random_split(data,[int(len(data)*0.8),len(data)-int(len(data)*0.8)])) #idk why I didn't just use variables for this. I will probably clean it up later
     train_loader = torch.utils.data.DataLoader(trains, batch_size=200, shuffle=True, drop_last = True)
