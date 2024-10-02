@@ -49,7 +49,7 @@ num_epochs = 5
 optimizer = torch.optim.Adam(model.parameters(), lr = 0.002)
 loss = nn.CrossEntropyLoss()
 test_dataset = []
-for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/1000)):
+for numberoftimesthishappens in range(int(sum(1 for _ in open("./games_I_think"))/1000)):
     data = []
     with open("./games_I_think", "r") as f: #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
         for line in itertools.islice(f, numberoftimesthishappens*1000,(numberoftimesthishappens*1000)+1000):
@@ -72,7 +72,7 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         winner = data[0][pieceofdata].split("^")[1][-3:-1]
 
         if "1" in winner:
-            winner = 1
+            winner = -1
         elif "0" in winner:
             winner = 0
         elif "-1" in winner:
@@ -127,16 +127,13 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
     data = bigarray
 
     data = pd.DataFrame(data)
-    #data["winner"] = data.iloc[:, -1:]
-    #print(data)
-    df_min = data.loc[data[48] == 1] #white wins
-    print(df_min)
-    df_maj = data.loc[data[48] == -1]
-    #print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    data["winner"] = data.iloc[:, -1:]
+    df_min = data.loc[data["winner"] == 1] #white wins
+    df_maj = data.loc[data["winner"] == -1]
+    print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     while len(df_maj) > len(df_min): #downsampling, but this is going to gerrymander when i turn it into batches so probably find a better way to do it. 
         r = random.randrange(0, len(df_maj) -1)
         df_maj[r].drop
-
     data = pd.concat([df_maj, df_min], ignore_index = True)
     finTensor = torch.Tensor(data.columns[-1])
     y = torch.Tensor(data.columns[:-1]) #this is all dumb fix later
@@ -148,6 +145,7 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
     for epoch in range(num_epochs):
         train_batch = iter(train_loader)
         for inputs, targets in train_batch:
+            print("works")
             inputs = inputs.to(device)
             targets = targets.to(device)
             model.train()
