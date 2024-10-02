@@ -48,11 +48,12 @@ model = cnn()
 num_epochs = 5
 optimizer = torch.optim.Adam(model.parameters(), lr = 0.002)
 loss = nn.CrossEntropyLoss()
+batch_size_idkifimadethisavariablealreadysonowitsreallylong = 100000
 test_dataset = []
-for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/1000)):
+for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/batch_size_idkifimadethisavariablealreadysonowitsreallylong)):
     data = []
     with open("./games_I_think", "r") as f: #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
-        for line in itertools.islice(f, numberoftimesthishappens*1000,(numberoftimesthishappens*1000)+1000):
+        for line in itertools.islice(f, numberoftimesthishappens*batch_size_idkifimadethisavariablealreadysonowitsreallylong,(numberoftimesthishappens*batch_size_idkifimadethisavariablealreadysonowitsreallylong)+batch_size_idkifimadethisavariablealreadysonowitsreallylong):
             data.append(line)
     print(data)
     data = pd.DataFrame(data)
