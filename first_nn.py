@@ -48,14 +48,14 @@ model = cnn()
 num_epochs = 5
 optimizer = torch.optim.Adam(model.parameters(), lr = 0.002)
 loss = nn.CrossEntropyLoss()
-batch_size_idkifimadethisavariablealreadysonowitsreallylong = 100000
+batch_size_idkifimadethisavariablealreadysonowitsreallylong = 1000
 test_dataset = []
 for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think'))/batch_size_idkifimadethisavariablealreadysonowitsreallylong)):
     data = []
     with open("./games_I_think", "r") as f: #games don't include ties rn idk why that is. will fix later. so don't spend too much time training on potentially wrong data
         for line in itertools.islice(f, numberoftimesthishappens*batch_size_idkifimadethisavariablealreadysonowitsreallylong,(numberoftimesthishappens*batch_size_idkifimadethisavariablealreadysonowitsreallylong)+batch_size_idkifimadethisavariablealreadysonowitsreallylong):
             data.append(line)
-    print(data)
+    #print(data)
     data = pd.DataFrame(data)
     #int(sum(1 for _ in open('./games_I_think'))/1000)
     #board.set("data")
@@ -71,13 +71,12 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
         hand1 = []
         hand2 = []
         winner = data[0][pieceofdata].split("^")[1][-3:-1]
-
-        if "1" in winner:
+        if "-1" in winner:
+            winner = -1
+        elif "1" in winner:
             winner = 1
         elif "0" in winner:
             winner = 0
-        elif "-1" in winner:
-            winner = -1
         smallarray.append(winner)
         board.set(moves[:-1])
         arr = [[[0 for b in range(9)]for a in range(9)] for c in range(48)] #this looks funny
@@ -126,29 +125,40 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
     bigarray[48] = smallarray
     
     data = bigarray
-
+    
     data = pd.DataFrame(data)
     #data["winner"] = data.iloc[:, -1:]
     #print(data)
+    #print(data) 
+    #was working on downsampling, but it might not do anything because of further resarch showing that black actually doesn't have an advantage will leave as comment for now
+    """
+    major = data[data.columns[-1]].sum()
+    if major ==
     df_min = data.loc[data[48] == 1] #white wins
-    print(df_min)
+    #print(len(df_min))
     df_maj = data.loc[data[48] == -1]
-    #print(df_min) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    #print(df_maj) #             this is my favorite comment by far ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     while len(df_maj) > len(df_min): #downsampling, but this is going to gerrymander when i turn it into batches so probably find a better way to do it. 
         r = random.randrange(0, len(df_maj) -1)
         df_maj[r].drop
-
     data = pd.concat([df_maj, df_min], ignore_index = True)
+    """
+    #print("got this far")
+    print(data)
     finTensor = torch.Tensor(data.columns[-1])
+    #print(finTensor)
     y = torch.Tensor(data.columns[:-1]) #this is all dumb fix later
     data = torch.utils.data.TensorDataset(finTensor,y)
+    
     trains,tests=(torch.utils.data.random_split(data,[int(len(data)*0.8),len(data)-int(len(data)*0.8)])) #idk why I didn't just use variables for this. I will probably clean it up later
     train_loader = torch.utils.data.DataLoader(trains, batch_size=200, shuffle=True, drop_last = True)
     test_dataset.append(tests)
-    
+    print(len(train_loader))
     for epoch in range(num_epochs):
+        #print("here")
         train_batch = iter(train_loader)
         for inputs, targets in train_batch:
+            print("over here")
             inputs = inputs.to(device)
             targets = targets.to(device)
             model.train()
@@ -161,6 +171,7 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
             optimizer.step()
             print(loss)
     torch.save(model.state_dict(), str(numberoftimesthishappens)+ "badnn.pt")
-with open("testing", r) as f:
+test_dataset = [str(x) for x in test_dataset]
+with open("testing", "w") as f:
 	f.writelines(test_dataset)
 
