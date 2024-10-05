@@ -149,7 +149,7 @@ for numberoftimesthishappens in range(int(sum(1 for _ in open('./games_I_think')
     #print(finTensor)
     y = torch.Tensor(data.columns[:-1]) #this is all dumb fix later
     data = torch.utils.data.TensorDataset(finTensor,y)
-    
+    print(data)
     trains,tests=(torch.utils.data.random_split(data,[int(len(data)*0.8),len(data)-int(len(data)*0.8)])) #idk why I didn't just use variables for this. I will probably clean it up later
     train_loader = torch.utils.data.DataLoader(trains, batch_size=200, shuffle=True, drop_last = True)
     test_dataset.append(tests)
